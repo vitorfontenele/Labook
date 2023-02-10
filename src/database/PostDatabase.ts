@@ -1,4 +1,5 @@
 import { BaseDatabase } from "./BaseDatabase";
+import { PostDB } from "../types";
 
 export class PostDatabase extends BaseDatabase {
     public static TABLE_POSTS = "posts";
@@ -9,13 +10,13 @@ export class PostDatabase extends BaseDatabase {
         return result;
     }
 
-    public async createPost(newPostDB){
+    public async createPost(newPostDB : PostDB){
         await BaseDatabase
             .connection(PostDatabase.TABLE_POSTS)
             .insert(newPostDB);
     }
 
-    public async updatePostById(updatedPostDB, id : string){
+    public async updatePostById(updatedPostDB : PostDB, id : string){
         await BaseDatabase
             .connection(PostDatabase.TABLE_POSTS)
             .update(updatedPostDB)
