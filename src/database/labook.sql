@@ -34,9 +34,14 @@ CREATE TABLE posts (
     likes INTEGER DEFAULT(0),
     dislikes INTEGER DEFAULT(0),
     created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL
+    updated_at TEXT NOT NULL,
+    FOREIGN KEY (creator_id) REFERENCES users(id)
 );
 
 -- query g
-INSERT INTO posts(id, creator_id, content, likes, dislikes, created_at, updated_at) VALUES 
+INSERT INTO posts(id, creator_id, content, created_at, updated_at) VALUES 
+    ("post001", "u001", "Hello World!", "2022-06-03T11:45:23Z", "2022-06-03T11:45:23Z");
+
+-- query h
+SELECT * FROM posts;
 
