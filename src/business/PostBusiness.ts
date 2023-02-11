@@ -90,6 +90,24 @@ export class PostBusiness {
         await postDatabase.updatePostById(postDB, id);
     }
 
+    public async updatePostLikesById(input : any, id : string){
+        const updatedLike = input.like;
+        const postDatabase = new PostDatabase();
+
+        const postDB = await postDatabase.findPostById(id);
+        if (!postDB){
+            throw new NotFoundError("Não foi encontrado um post com esse id");
+        }
+
+        if (typeof updatedLike !== "boolean"){
+            throw new BadRequestError("'like' deve ser um boolean");
+        }
+
+        // const currentLikes = postDB.likes;
+        // const currentDislikes = postDB.dislikes;
+        // if (likes)
+    }
+
     public async deletePostById(id : string){
         const postDatabase = new PostDatabase();
         const postDB = await postDatabase.findPostById(id);
