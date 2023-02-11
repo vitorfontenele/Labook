@@ -1,12 +1,15 @@
 export class Post {
     constructor(
         private id : string,
-        private creatorId : string,
         private content : string,
         private likes : number,
         private dislikes : number,
         private createdAt : string,
-        private updatedAt : string
+        private updatedAt : string,
+        private creator: {
+            id: string,
+            name: string
+        }
     ){}
 
     public getId(): string {
@@ -15,14 +18,6 @@ export class Post {
 
     public setId(value: string): void {
         this.id = value
-    }
-
-    public getCreatorId(): string {
-        return this.creatorId
-    }
-
-    public setCreatorId(value: string): void {
-        this.creatorId = value
     }
 
     public getContent(): string {
@@ -63,5 +58,19 @@ export class Post {
 
     public setUpdatedAt(value: string): void {
         this.updatedAt = value
+    }
+
+    public getCreator() : {
+        id : string
+        name : string
+    } {
+        return this.creator
+    }
+
+    public setCreator(value: {
+        id : string,
+        name: string
+    }){
+        this.creator = value;
     }
 }
