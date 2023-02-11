@@ -1,17 +1,18 @@
+import { UserDB } from "../types";
 import { BaseDatabase } from "./BaseDatabase";
 
 export class UserDatabase extends BaseDatabase {
     public static TABLE_USERS = "users";
     
     public async findUsers(){
-        const usersDB = await BaseDatabase
+        const usersDB : UserDB[] = await BaseDatabase
             .connection(UserDatabase.TABLE_USERS);
 
         return usersDB;
     }
 
     public async findUserById(id : string){
-        const [ result ] = await BaseDatabase
+        const [ result ] : UserDB[] | undefined[] = await BaseDatabase
             .connection(UserDatabase.TABLE_USERS)
             .where({ id });
         return result;
