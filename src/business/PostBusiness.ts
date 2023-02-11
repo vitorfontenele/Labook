@@ -76,28 +76,28 @@ export class PostBusiness {
         const { content } = input;
         const postDatabase = new PostDatabase();
 
-        // const postDB = await postDatabase.findPostById(id);
-        // if (!postDB){
-        //     throw new NotFoundError("Não foi encontrado um post com esse id");
-        // }
+        const postDB = await postDatabase.findPostById(id);
+        if (!postDB){
+            throw new NotFoundError("Não foi encontrado um post com esse id");
+        }
 
         if (typeof content !== "string"){
             throw new BadRequestError("'content' deve ser uma string");
         }
 
-        // postDB["content"] = content;
+        postDB["content"] = content;
 
-        // await postDatabase.updatePostById(postDB, id);
+        await postDatabase.updatePostById(postDB, id);
     }
 
     public async deletePostById(id : string){
         const postDatabase = new PostDatabase();
-        // const postDB = await postDatabase.findPostById(id);
+        const postDB = await postDatabase.findPostById(id);
 
-        // if (!postDB){
-        //     throw new NotFoundError("Não existe um post com esse 'id'");
-        // }
+        if (!postDB){
+            throw new NotFoundError("Não existe um post com esse 'id'");
+        }
 
-        // await postDatabase.deletePostById(id);
+        await postDatabase.deletePostById(id);
     }
 }
