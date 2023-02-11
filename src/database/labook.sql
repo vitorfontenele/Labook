@@ -59,7 +59,8 @@ CREATE TABLE likes_dislikes (
     post_id TEXT NOT NULL,
     like INTEGER NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id),
-    FOREIGN KEY (post_id) REFERENCES post(id)
+    FOREIGN KEY (post_id) REFERENCES post(id),
+    UNIQUE (user_id, post_id)
 );
 
 -- query k

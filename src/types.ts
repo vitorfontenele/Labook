@@ -16,3 +16,9 @@ export interface UserDB {
     role: string
     created_at: string
 }
+
+export interface LikesDislikesDB {
+    user_id: string
+    post_id: string
+    like: number
+}
