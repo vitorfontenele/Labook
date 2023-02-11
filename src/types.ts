@@ -7,3 +7,12 @@ export interface PostDB {
     created_at: string
     updated_at: string
 }
+
+export interface UserDB {
+    id: string
+    name: string
+    email: string
+    password: string
+    role: string
+    created_at: string
+}
