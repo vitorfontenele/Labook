@@ -53,7 +53,7 @@ export class PostController {
             }
 
             const postBusiness = new PostBusiness();
-            // await postBusiness.updatePostById(input, id);
+            await postBusiness.updatePostById(input, id);
 
             res.status(200).send("Post atualizado com sucesso");
         } catch (error) {
@@ -72,7 +72,7 @@ export class PostController {
             const id = req.params.id;
 
             const postBusiness = new PostBusiness();
-            // await postBusiness.deletePostById(id);
+            await postBusiness.deletePostById(id);
 
             res.status(200).send("Post deletado com sucesso");
         } catch (error) {
