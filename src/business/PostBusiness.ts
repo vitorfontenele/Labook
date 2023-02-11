@@ -1,7 +1,7 @@
 import { PostDatabase } from "../database/PostDatabase";
 import { UserDatabase } from "../database/UserDatabase";
 import { Post } from "../models/Post";
-import { PostDB, UserDB } from "../types";
+import { UserDB } from "../types";
 
 export class PostBusiness {
     public async getPosts(){
@@ -23,7 +23,7 @@ export class PostBusiness {
 
         function getCreator(userId : string){
             const user = usersDB.find(userDB => userDB.id === userId) as UserDB;
-            
+
             return {
                 id: user.id,
                 name: user.name
