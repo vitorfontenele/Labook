@@ -1,3 +1,4 @@
+import { LikesDislikesDatabase } from "../database/LikesDislikesDatabase";
 import { PostDatabase } from "../database/PostDatabase";
 import { UserDatabase } from "../database/UserDatabase";
 import { BadRequestError } from "../errors/BadRequestError";
@@ -91,6 +92,9 @@ export class PostBusiness {
     }
 
     public async updatePostLikesById(input : any, id : string){
+        // Dado mockado
+        const userId = "u003";
+
         const updatedLike = input.like;
         const postDatabase = new PostDatabase();
 
@@ -103,9 +107,45 @@ export class PostBusiness {
             throw new BadRequestError("'like' deve ser um boolean");
         }
 
-        // const currentLikes = postDB.likes;
-        // const currentDislikes = postDB.dislikes;
-        // if (likes)
+        const likesDislikesDatabase = new LikesDislikesDatabase();
+        const likesDislikesDB = await likesDislikesDatabase.findLikeByUserAndPostId(userId, postDB.id);
+        if (!likesDislikesDB){
+            // Caso nao exista nem like nem dislike do user no post
+            if (updatedLike){
+                // caso seja dado o like
+                await likesDislikesDatabase.createLike({
+                    user_id: userId,
+                    post_id: postDB.id,
+                    like: 1
+                })
+            } else {
+                // caso seja dado dislike
+                await likesDislikesDatabase.createLike({
+                    user_id: userId,
+                    post_id: postDB.id,
+                    like: 0
+                })
+            }
+        } else {
+            // Caso já exista um like ou dislike do user no post
+            const like = likesDislikesDB.like;
+            // Usuário dá like num post que já havia dado like
+            // ou dá dislike num post que já havia dado dislike
+            if ((updatedLike && like)){
+                await likesDislikesDatabase.deleteLikeByUserAndPostId(userId, postDB.id);
+            } else {
+                const newLike = like === 0 ? 1 : 0;
+                await likesDislikesDatabase.updateLikeByUserAndPostId(
+                    {
+                        user_id: userId,
+                        post_id: postDB.id,
+                        like: newLike
+                    },
+                    userId,
+                    postDB.id
+                )
+            }
+        }
     }
 
     public async deletePostById(id : string){
