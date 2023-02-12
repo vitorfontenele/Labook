@@ -8,4 +8,5 @@ export const postRouter = express.Router();
 postRouter.get("/", postController.getPosts);
 postRouter.post("/", postController.createPost);
 postRouter.put("/:id", postController.updatePostById);
+postRouter.put("/:id/like", postController.updatePostLikesById);
 postRouter.delete("/:id", postController.deletePostById);
