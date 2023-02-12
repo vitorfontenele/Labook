@@ -67,6 +67,30 @@ export class PostController {
         }
     }
 
+    public updatePostLikesById = async(req: Request, res: Response) => {
+        try {
+            const id = req.params.id;
+            const like = req.body.like;
+
+            const input = {
+                like
+            }
+
+            const postBusiness = new PostBusiness();
+            await postBusiness.updatePostLikesById(input, id);
+
+            res.status(200).send("Like atualizado com sucesso");
+        } catch (error) {
+            console.log(error)
+
+            if (error instanceof BaseError) {
+                res.status(error.statusCode).send(error.message)
+            } else {
+                res.status(500).send("Erro inesperado")
+            }
+        }
+    }
+
     public deletePostById = async(req: Request, res: Response) => {
         try {
             const id = req.params.id;
