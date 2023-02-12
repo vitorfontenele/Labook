@@ -17,10 +17,11 @@ export class LikesDislikesDB extends BaseDatabase {
             .insert(newLikeDB);
     }
 
-    public async updateLike(updatedLikeDB : LikesDislikesDB){
+    public async updateLikeByUserAndPostId(updatedLikeDB : LikesDislikesDB, user_id : string, post_id : string){
         await BaseDatabase
             .connection(LikesDislikesDB.TABLE_LIKES_DISLIKES)
-            .update(updatedLikeDB);
+            .update(updatedLikeDB)
+            .where({user_id, post_id});
     }
 
     public async deleteLikeByUserAndPostId(user_id : string, post_id : string){
