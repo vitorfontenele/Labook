@@ -1,4 +1,5 @@
 import { BadRequestError } from "../errors/BadRequestError";
+import { User } from "../models/User";
 
 export interface CreateUserInputDTO {
     name : string
@@ -6,7 +7,23 @@ export interface CreateUserInputDTO {
     password : string
 } 
 
+export interface GetUserOutputDTO {
+    id: string
+    name: string
+    email: string
+}
+
 export class UserDTO {
+    getUserOutput(user: User) : GetUserOutputDTO {
+        const result : GetUserOutputDTO = {
+            id: user.getId(),
+            name: user.getName(),
+            email: user.getEmail()
+        }
+
+        return result;
+    }
+
     createUserInput(name: unknown, email: unknown, password: unknown) : CreateUserInputDTO {
         if (typeof name !== "string"){
             throw new BadRequestError("'name' precisa ser uma string");
