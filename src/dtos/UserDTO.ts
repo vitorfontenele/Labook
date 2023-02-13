@@ -7,7 +7,7 @@ export interface CreateUserInputDTO {
 } 
 
 export class UserDTO {
-    createUserDTO(name: unknown, email: unknown, password: unknown) : CreateUserInputDTO {
+    createUserInput(name: unknown, email: unknown, password: unknown) : CreateUserInputDTO {
         if (typeof name !== "string"){
             throw new BadRequestError("'name' precisa ser uma string");
         }
