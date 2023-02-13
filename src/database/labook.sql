@@ -70,4 +70,3 @@ INSERT INTO likes_dislikes VALUES
 
 -- query l
 SELECT * FROM likes_dislikes;
-
