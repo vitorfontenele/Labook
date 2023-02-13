@@ -1,5 +1,6 @@
 import { Request , Response } from "express";
 import { PostBusiness } from "../business/PostBusiness";
+import { PostDTO } from "../dtos/PostDTO";
 import { BaseError } from "../errors/BaseError";
 
 export class PostController {
@@ -24,9 +25,8 @@ export class PostController {
         try {
             const content = req.body.content;
 
-            const input = {
-                content
-            };
+            const postDTO = new PostDTO();
+            const input = postDTO.createPostInput(content);
 
             const postBusiness = new PostBusiness();
             await postBusiness.createPost(input);
@@ -48,12 +48,11 @@ export class PostController {
             const id = req.params.id;
             const content = req.body.content;
 
-            const input = {
-                content
-            }
+            const postDTO = new PostDTO();
+            const input = postDTO.editPostInput(id, content);
 
             const postBusiness = new PostBusiness();
-            await postBusiness.updatePostById(input, id);
+            await postBusiness.updatePostById(input);
 
             res.status(200).send("Post atualizado com sucesso");
         } catch (error) {
@@ -72,12 +71,11 @@ export class PostController {
             const id = req.params.id;
             const like = req.body.like;
 
-            const input = {
-                like
-            }
+            const postDTO = new PostDTO();
+            const input = postDTO.editPostLikesInput(id, like);
 
             const postBusiness = new PostBusiness();
-            await postBusiness.updatePostLikesById(input, id);
+            await postBusiness.updatePostLikesById(input);
 
             res.status(200).send("Like atualizado com sucesso");
         } catch (error) {
