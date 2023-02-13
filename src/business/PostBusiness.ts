@@ -1,7 +1,7 @@
 import { LikesDislikesDatabase } from "../database/LikesDislikesDatabase";
 import { PostDatabase } from "../database/PostDatabase";
 import { UserDatabase } from "../database/UserDatabase";
-import { CreatePostInputDTO, EditPostInputDTO, EditPostLikesInputDTO } from "../dtos/PostDTO";
+import { CreatePostInputDTO, EditPostInputDTO, EditPostLikesInputDTO, GetPostOutputDTO, PostDTO } from "../dtos/PostDTO";
 import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { LikesDislikes } from "../models/LikesDislikes";
@@ -9,22 +9,28 @@ import { Post } from "../models/Post";
 import { LikesDislikesDB, PostDB, UserDB } from "../types";
 
 export class PostBusiness {
-    public async getPosts(){
+    public async getPosts() : Promise<GetPostOutputDTO[]>{
         const postDatabase = new PostDatabase();
         const postsDB = await postDatabase.findPosts();
 
         const userDatabase = new UserDatabase();
         const usersDB = await userDatabase.findUsers();
 
-        const output = postsDB.map(postDB => new Post (
-            postDB.id,
-            postDB.content,
-            postDB.likes,
-            postDB.dislikes,
-            postDB.created_at,
-            postDB.updated_at,
-            getCreator(postDB.creator_id)
-        ));
+        const postDTO = new PostDTO();
+
+        const output = postsDB.map(postDB => {
+            const post = new Post (
+                postDB.id,
+                postDB.content,
+                postDB.likes,
+                postDB.dislikes,
+                postDB.created_at,
+                postDB.updated_at,
+                getCreator(postDB.creator_id)
+            );
+
+            return postDTO.getPostOutput(post);
+        })             
 
         function getCreator(userId : string){
             const user = usersDB.find(userDB => userDB.id === userId) as UserDB;
@@ -38,7 +44,7 @@ export class PostBusiness {
         return output;
     }
 
-    public async getPostById(id : string){
+    public async getPostById(id : string) : Promise<GetPostOutputDTO>{
         const postDatabase = new PostDatabase();
         const userDatabase = new UserDatabase();
 
@@ -51,7 +57,7 @@ export class PostBusiness {
         const userDB = await userDatabase.findUserById(userId);
         const userName = userDB?.name;
 
-        const output = new Post(
+        const post = new Post(
             postDB.id,
             postDB.content,
             postDB.likes,
@@ -64,10 +70,13 @@ export class PostBusiness {
             }
         )
 
+        const postDTO = new PostDTO();
+        const output = postDTO.getPostOutput(post);
+
         return output;
     }
 
-    public async createPost(input : CreatePostInputDTO){
+    public async createPost(input : CreatePostInputDTO) : Promise<void>{
         const { content } = input;
         const postDatabase = new PostDatabase();
 
@@ -102,7 +111,7 @@ export class PostBusiness {
         await postDatabase.createPost(newPostDB);
     }
 
-    public async updatePostById(input : EditPostInputDTO){
+    public async updatePostById(input : EditPostInputDTO) : Promise<void>{
         const { content , id } = input;
         const postDatabase = new PostDatabase();
 
@@ -119,7 +128,7 @@ export class PostBusiness {
         await postDatabase.updatePostById(postDB, id);
     }
 
-    public async updatePostLikesById(input : EditPostLikesInputDTO){
+    public async updatePostLikesById(input : EditPostLikesInputDTO) : Promise<void>{
         // Dado mockado
         const userId = "u003";
 
@@ -210,14 +219,19 @@ export class PostBusiness {
         await postDatabase.updatePostById(postDB, postId);
     }
 
-    public async deletePostById(id : string){
+    public async deletePostById(id : string) : Promise<void>{
         const postDatabase = new PostDatabase();
         const postDB = await postDatabase.findPostById(id);
+
+        const likesDislikesDatabase = new LikesDislikesDatabase();
+        const likesDislikesDB = await likesDislikesDatabase.findLikesByPostId(id);
 
         if (!postDB){
             throw new NotFoundError("Não existe um post com esse 'id'");
         }
-
+        if (likesDislikesDB.length > 0){
+            await likesDislikesDatabase.deleteLikesByPostId(id);
+        }
         await postDatabase.deletePostById(id);
     }
 }

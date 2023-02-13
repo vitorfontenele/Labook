@@ -12,6 +12,14 @@ export class LikesDislikesDatabase extends BaseDatabase {
         return result;
     }
 
+    public async findLikesByPostId(post_id: string){
+        const result : LikesDislikesDB[] = await BaseDatabase
+            .connection(LikesDislikesDatabase.TABLE_LIKES_DISLIKES)
+            .where({post_id});
+            
+        return result;
+    }
+
     public async createLike(newLikeDB : LikesDislikesDB){
         await BaseDatabase
             .connection(LikesDislikesDatabase.TABLE_LIKES_DISLIKES)
@@ -30,5 +38,12 @@ export class LikesDislikesDatabase extends BaseDatabase {
             .connection(LikesDislikesDatabase.TABLE_LIKES_DISLIKES)
             .del()
             .where({user_id, post_id});
+    }
+
+    public async deleteLikesByPostId(post_id: string){
+        await BaseDatabase
+            .connection(LikesDislikesDatabase.TABLE_LIKES_DISLIKES)
+            .del()
+            .where({post_id});
     }
 }
