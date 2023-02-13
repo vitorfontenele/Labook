@@ -1,4 +1,5 @@
 import { UserDatabase } from "../database/UserDatabase";
+import { CreateUserInputDTO } from "../dtos/UserDTO";
 import { User } from "../models/User";
 
 export class UserBusiness {
@@ -18,7 +19,21 @@ export class UserBusiness {
         return output;
     }
 
-    public async createUser(){
+    public async createUser(input : CreateUserInputDTO){
+        const { name , email , password } = input;
+
+        const userDatabase = new UserDatabase();
         
+        const id = ((new Date()).getTime()).toString();
+        const createdAt = (new Date()).toISOString();
+        const role = "author";
+
+        const newUser = new User (id, name, email, password,role, createdAt);
+
+        // const newUserDB : UserDB = {
+            
+        // }
+
+        // await userDatabase.createUser(newUserDB);
     }
 }
