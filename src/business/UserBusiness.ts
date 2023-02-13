@@ -1,5 +1,5 @@
 import { UserDatabase } from "../database/UserDatabase";
-import { CreateUserInputDTO } from "../dtos/UserDTO";
+import { CreateUserInputDTO, UserDTO } from "../dtos/UserDTO";
 import { NotFoundError } from "../errors/NotFoundError";
 import { User } from "../models/User";
 import { UserDB } from "../types";
@@ -8,12 +8,19 @@ export class UserBusiness {
     public async getUsers(){
         const userDatabase = new UserDatabase();
         const usersDB = await userDatabase.findUsers();
+        const userDTO = new UserDTO();
 
-        const output = usersDB.map(userDB => new User(
-            userDB.id,
-            userDB.name,
-            userDB.email
-        ));
+        const output = usersDB.map(userDB => {
+            const user = new User(
+                userDB.id,
+                userDB.name,
+                userDB.email,
+                userDB.password,
+                userDB.role,
+                userDB.created_at)
+
+            return userDTO.getUserOutput(user)
+        });
 
         return output;
     }
@@ -26,11 +33,17 @@ export class UserBusiness {
             throw new NotFoundError("Não foi encontrado um user com esse 'id'");
         }
 
-        const output = new User(
+        const user = new User(
             userDB.id,
             userDB.name,
             userDB.email,
-        )
+            userDB.password,
+            userDB.role,
+            userDB.created_at
+        );
+
+        const userDTO = new UserDTO();
+        const output = userDTO.getUserOutput(user);
 
         return output;
     }
