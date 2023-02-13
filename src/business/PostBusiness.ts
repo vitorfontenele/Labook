@@ -3,8 +3,9 @@ import { PostDatabase } from "../database/PostDatabase";
 import { UserDatabase } from "../database/UserDatabase";
 import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
+import { LikesDislikes } from "../models/LikesDislikes";
 import { Post } from "../models/Post";
-import { PostDB, UserDB } from "../types";
+import { LikesDislikesDB, PostDB, UserDB } from "../types";
 
 export class PostBusiness {
     public async getPosts(){
@@ -94,7 +95,7 @@ export class PostBusiness {
 
     public async updatePostLikesById(input : any, id : string){
         // Dado mockado
-        const userId = "u001";
+        const userId = "u003";
 
         const updatedLike = input.like;
         const postDatabase = new PostDatabase();
@@ -103,6 +104,8 @@ export class PostBusiness {
         if (!postDB){
             throw new NotFoundError("Não foi encontrado um post com esse id");
         }
+
+        const postId = postDB.id as string;
 
         if (postDB.creator_id === userId){
             throw new BadRequestError("Usuário não pode dar dislike/like no próprio post");
@@ -115,68 +118,73 @@ export class PostBusiness {
         const likesDislikesDatabase = new LikesDislikesDatabase();
         const likesDislikesDB = await likesDislikesDatabase.findLikeByUserAndPostId(userId, postDB.id);
 
+        let deltaLikes = 0;
+        let deltaDislikes = 0;
+
         if (!likesDislikesDB){
             // Caso nao exista nem like nem dislike do user no post
+            const newLikesDislikes = new LikesDislikes(userId, postId);
+
             if (updatedLike){
                 // caso seja dado o like
-                await likesDislikesDatabase.createLike({
-                    user_id: userId,
-                    post_id: postDB.id,
-                    like: 1
-                })
-                // +1 like
-                postDB.likes += 1;
-                await postDatabase.updatePostById(postDB, postDB.id);
+                newLikesDislikes.setLike(1);
+                deltaLikes = 1;
             } else {
                 // caso seja dado dislike
-                await likesDislikesDatabase.createLike({
-                    user_id: userId,
-                    post_id: postDB.id,
-                    like: 0
-                })
-                // +1 dislike
-                postDB.dislikes += 1;
-                await postDatabase.updatePostById(postDB, postDB.id);
+                newLikesDislikes.setLike(0);
+                deltaDislikes = 1;
             }
+
+            const newLikesDislikesDB : LikesDislikesDB = {
+                user_id : newLikesDislikes.getUserId(),
+                post_id : newLikesDislikes.getPostId(),
+                like : newLikesDislikes.getLike()
+            }
+
+            await likesDislikesDatabase.createLike(newLikesDislikesDB);
         } else {
             // Caso já exista um like ou dislike do user no post
             const like = likesDislikesDB.like;
-            // Usuário dá like num post que já havia dado like
-            // ou dá dislike num post que já havia dado dislike
+
             if ((updatedLike === Boolean(like))){
-                await likesDislikesDatabase.deleteLikeByUserAndPostId(userId, postDB.id);
+                // Usuário dá like num post que já havia dado like
+                // ou dá dislike num post que já havia dado dislike
+                await likesDislikesDatabase.deleteLikeByUserAndPostId(userId, postId);
+
                 if (updatedLike){
                     // -1 like
-                    postDB.likes -= 1;
-                    await postDatabase.updatePostById(postDB, postDB.id);
+                    deltaLikes = -1;
                 } else {
                     // -1 dislike
-                    postDB.dislikes -= 1;
-                    await postDatabase.updatePostById(postDB, postDB.id);
+                    deltaDislikes = -1;
                 }
+
             } else {
-                const newLike = like === 0 ? 1 : 0;
-                await likesDislikesDatabase.updateLikeByUserAndPostId(
-                    {
-                        user_id: userId,
-                        post_id: postDB.id,
-                        like: newLike
-                    },
-                    userId,
-                    postDB.id
-                )
+                // Usuário dá like num post que já havia dado dislike
+                // ou dá dislike num post que já havia dado like
+                const updatedLike = Number(!like);
+                const updatedLikesDislikes = new LikesDislikes(userId, postId, updatedLike);
 
-                if (newLike){
-                    postDB.likes += 1;
-                    postDB.dislikes -= 1;
-                } else {
-                    postDB.likes -= 1;
-                    postDB.dislikes += 1;
+                const updatedLikesDislikesDB : LikesDislikesDB = {
+                    user_id: updatedLikesDislikes.getUserId(),
+                    post_id: updatedLikesDislikes.getPostId(),
+                    like: updatedLikesDislikes.getLike()
                 }
 
-                await postDatabase.updatePostById(postDB, postDB.id);
+                await likesDislikesDatabase.updateLikeByUserAndPostId(
+                    updatedLikesDislikesDB,
+                    userId,
+                    postId
+                );
+
+                deltaLikes = updatedLike ? 1 : -1;
+                deltaDislikes = updatedLike ? -1 : 1;
             }
         }
+
+        postDB.likes += deltaLikes;
+        postDB.dislikes += deltaDislikes;
+        await postDatabase.updatePostById(postDB, postId);
     }
 
     public async deletePostById(id : string){
