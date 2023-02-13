@@ -38,6 +38,32 @@ export class PostBusiness {
         return output;
     }
 
+    public async getPostById(id : string){
+        const postDatabase = new PostDatabase();
+        const userDatabase = new UserDatabase();
+
+        const postDB = await postDatabase.findPostById(id);
+        if (!postDB){
+            throw new Error ("Não foi encontrado um post com esse 'id'");
+        }
+
+        const userId = postDB.creator_id;
+        const userDB = await userDatabase.findUserById(userId);
+        const userName = userDB?.name;
+
+        const output = new Post(
+            postDB.id,
+            postDB.content,
+            postDB.likes,
+            postDB.dislikes,
+            postDB.created_at,
+            postDB.updated_at,
+            {id: userId, name: userName as string}
+        )
+
+        return output;
+    }
+
     public async createPost(input : CreatePostInputDTO){
         const { content } = input;
         const postDatabase = new PostDatabase();
