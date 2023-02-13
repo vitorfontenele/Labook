@@ -1,4 +1,6 @@
 export class User {
+    // password, role e createdAt opcionais
+    // Esses dados nao precisam ser mostrados nas requisicoes GET
     constructor(
         private id : string,
         private name : string,
