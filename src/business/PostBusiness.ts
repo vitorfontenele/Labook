@@ -110,6 +110,7 @@ export class PostBusiness {
 
         const likesDislikesDatabase = new LikesDislikesDatabase();
         const likesDislikesDB = await likesDislikesDatabase.findLikeByUserAndPostId(userId, postDB.id);
+
         if (!likesDislikesDB){
             // Caso nao exista nem like nem dislike do user no post
             if (updatedLike){
@@ -119,7 +120,6 @@ export class PostBusiness {
                     post_id: postDB.id,
                     like: 1
                 })
-
                 // +1 like
                 postDB.likes += 1;
                 await postDatabase.updatePostById(postDB, postDB.id);
@@ -139,7 +139,7 @@ export class PostBusiness {
             const like = likesDislikesDB.like;
             // Usuário dá like num post que já havia dado like
             // ou dá dislike num post que já havia dado dislike
-            if ((updatedLike && like)){
+            if ((updatedLike === Boolean(like))){
                 await likesDislikesDatabase.deleteLikeByUserAndPostId(userId, postDB.id);
                 if (updatedLike){
                     // -1 like
