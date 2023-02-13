@@ -1,6 +1,7 @@
 import { UserDatabase } from "../database/UserDatabase";
 import { CreateUserInputDTO } from "../dtos/UserDTO";
 import { User } from "../models/User";
+import { UserDB } from "../types";
 
 export class UserBusiness {
     public async getUsers(){
@@ -30,10 +31,15 @@ export class UserBusiness {
 
         const newUser = new User (id, name, email, password,role, createdAt);
 
-        // const newUserDB : UserDB = {
-            
-        // }
+        const newUserDB : UserDB = {
+            id: newUser.getId(),
+            name: newUser.getName(),
+            email: newUser.getEmail(),
+            password: newUser.getPassword(),
+            role: newUser.getRole(),
+            created_at: newUser.getCreatedAt()
+        };
 
-        // await userDatabase.createUser(newUserDB);
+        await userDatabase.createUser(newUserDB);
     }
 }
