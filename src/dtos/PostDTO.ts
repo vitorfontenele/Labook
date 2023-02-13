@@ -1,4 +1,6 @@
 import { BadRequestError } from "../errors/BadRequestError";
+import { Post } from "../models/Post";
+import { PostDB } from "../types";
 
 export interface CreatePostInputDTO {
     content : string
@@ -15,6 +17,20 @@ export interface EditPostLikesInputDTO {
 }
 
 export class PostDTO {
+    getPostOutput = (post: Post) : PostDB => {
+        const result : PostDB = {
+            id: post.getId(),
+            creator_id: post.getCreator().id,
+            content: post.getContent(),
+            likes: post.getLikes(),
+            dislikes: post.getDislikes(),
+            created_at: post.getCreatedAt(),
+            updated_at: post.getCreatedAt()
+        }
+        
+        return result;
+    }
+
     createPostInput = (content: unknown) : CreatePostInputDTO => {
         if (typeof content !== "string"){
             throw new BadRequestError("'content' deve ser uma string");

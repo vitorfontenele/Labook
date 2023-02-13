@@ -1,7 +1,7 @@
 import { LikesDislikesDatabase } from "../database/LikesDislikesDatabase";
 import { PostDatabase } from "../database/PostDatabase";
 import { UserDatabase } from "../database/UserDatabase";
-import { CreatePostInputDTO, EditPostInputDTO, EditPostLikesInputDTO } from "../dtos/PostDTO";
+import { CreatePostInputDTO, EditPostInputDTO, EditPostLikesInputDTO, PostDTO } from "../dtos/PostDTO";
 import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { LikesDislikes } from "../models/LikesDislikes";
@@ -51,7 +51,7 @@ export class PostBusiness {
         const userDB = await userDatabase.findUserById(userId);
         const userName = userDB?.name;
 
-        const output = new Post(
+        const post = new Post(
             postDB.id,
             postDB.content,
             postDB.likes,
@@ -63,6 +63,9 @@ export class PostBusiness {
               name: userName as string
             }
         )
+
+        const postDTO = new PostDTO();
+        const output = postDTO.getPostOutput(post);
 
         return output;
     }
