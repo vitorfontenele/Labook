@@ -41,10 +41,6 @@ export class PostBusiness {
         const { content } = input;
         const postDatabase = new PostDatabase();
 
-        if (typeof content !== "string"){
-            throw new BadRequestError("'content' deve ser uma string");
-        }
-
         const id = ((new Date()).getTime()).toString();
         const createdAt = (new Date()).toISOString();
 
