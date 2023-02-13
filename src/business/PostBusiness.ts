@@ -94,7 +94,7 @@ export class PostBusiness {
 
     public async updatePostLikesById(input : any, id : string){
         // Dado mockado
-        const userId = "u003";
+        const userId = "u001";
 
         const updatedLike = input.like;
         const postDatabase = new PostDatabase();
@@ -102,6 +102,10 @@ export class PostBusiness {
         const postDB = await postDatabase.findPostById(id);
         if (!postDB){
             throw new NotFoundError("Não foi encontrado um post com esse id");
+        }
+
+        if (postDB.creator_id === userId){
+            throw new BadRequestError("Usuário não pode dar dislike/like no próprio post");
         }
 
         if (typeof updatedLike !== "boolean"){
