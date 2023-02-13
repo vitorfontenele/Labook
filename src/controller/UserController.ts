@@ -28,7 +28,7 @@ export class UserController {
             const userBusiness = new UserBusiness();
             const output = await userBusiness.getUserById(id);
 
-            return output;
+            res.status(200).send(output);
         } catch (error) {
             console.log(error)
 
