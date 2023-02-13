@@ -44,7 +44,7 @@ export class PostBusiness {
 
         const postDB = await postDatabase.findPostById(id);
         if (!postDB){
-            throw new Error ("Não foi encontrado um post com esse 'id'");
+            throw new NotFoundError("Não foi encontrado um post com esse 'id'");
         }
 
         const userId = postDB.creator_id;
