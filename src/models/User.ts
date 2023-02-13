@@ -3,9 +3,9 @@ export class User {
         private id : string,
         private name : string,
         private email : string,
-        private password : string,
-        private role : string,
-        private createdAt : string
+        private password? : string,
+        private role? : string,
+        private createdAt? : string
     ){}
 
     public getId() : string {
@@ -32,7 +32,7 @@ export class User {
         this.email = value;
     }
 
-    public getPassword() : string {
+    public getPassword() : string | undefined {
         return this.password;
     }
 
@@ -40,7 +40,7 @@ export class User {
         this.password = value;
     }
 
-    public getRole() : string {
+    public getRole() : string | undefined {
         return this.role;
     }
 
@@ -48,7 +48,7 @@ export class User {
         this.role = value;
     }
 
-    public getCreatedAt() : string {
+    public getCreatedAt() : string | undefined {
         return this.createdAt;
     }
 
