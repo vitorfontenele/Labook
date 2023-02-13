@@ -17,4 +17,10 @@ export class UserDatabase extends BaseDatabase {
             .where({ id });
         return result;
     }
+
+    public async createUser(newUserDB : UserDB){
+        await BaseDatabase
+            .connection(UserDatabase.TABLE_USERS)
+            .insert(newUserDB);
+    }
 }
