@@ -223,10 +223,15 @@ export class PostBusiness {
         const postDatabase = new PostDatabase();
         const postDB = await postDatabase.findPostById(id);
 
+        const likesDislikesDatabase = new LikesDislikesDatabase();
+        const likesDislikesDB = await likesDislikesDatabase.findLikesByPostId(id);
+
         if (!postDB){
             throw new NotFoundError("Não existe um post com esse 'id'");
         }
-
+        if (likesDislikesDB.length > 0){
+            await likesDislikesDatabase.deleteLikesByPostId(id);
+        }
         await postDatabase.deletePostById(id);
     }
 }
