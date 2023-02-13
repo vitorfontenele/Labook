@@ -58,7 +58,10 @@ export class PostBusiness {
             postDB.dislikes,
             postDB.created_at,
             postDB.updated_at,
-            {id: userId, name: userName as string}
+            { 
+              id: userId, 
+              name: userName as string
+            }
         )
 
         return output;
@@ -70,12 +73,14 @@ export class PostBusiness {
 
         const id = ((new Date()).getTime()).toString();
         const createdAt = (new Date()).toISOString();
+        const likes = 0;
+        const dislikes = 0;
 
         const newPost = new Post (
             id,
             content,
-            0,
-            0,
+            likes,
+            dislikes,
             createdAt,
             createdAt,
             {
@@ -106,8 +111,10 @@ export class PostBusiness {
             throw new NotFoundError("Não foi encontrado um post com esse id");
         }
 
+        const updatedAt = (new Date()).toISOString();
+
         postDB["content"] = content;
-        postDB["updated_at"] = (new Date()).toISOString();
+        postDB["updated_at"] = updatedAt;
 
         await postDatabase.updatePostById(postDB, id);
     }
