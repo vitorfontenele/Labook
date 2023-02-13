@@ -1,6 +1,5 @@
 import { BadRequestError } from "../errors/BadRequestError";
 import { Post } from "../models/Post";
-import { PostDB } from "../types";
 
 export interface CreatePostInputDTO {
     content : string
@@ -16,16 +15,29 @@ export interface EditPostLikesInputDTO {
     like : boolean
 }
 
+export interface GetPostOutputDTO {
+    id : string
+    content : string
+    likes: number
+    dislikes: number
+    createdAt: string
+    updatedAt: string
+    creator: {
+        id: string,
+        name: string
+    }
+}
+
 export class PostDTO {
-    getPostOutput = (post: Post) : PostDB => {
-        const result : PostDB = {
+    getPostOutput = (post: Post) : GetPostOutputDTO => {
+        const result : GetPostOutputDTO = {
             id: post.getId(),
-            creator_id: post.getCreator().id,
             content: post.getContent(),
             likes: post.getLikes(),
             dislikes: post.getDislikes(),
-            created_at: post.getCreatedAt(),
-            updated_at: post.getCreatedAt()
+            createdAt: post.getCreatedAt(),
+            updatedAt: post.getCreatedAt(),
+            creator: post.getCreator()
         }
         
         return result;
