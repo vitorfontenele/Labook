@@ -17,4 +17,8 @@ export class UserBusiness {
 
         return output;
     }
+
+    public async createUser(){
+        
+    }
 }
