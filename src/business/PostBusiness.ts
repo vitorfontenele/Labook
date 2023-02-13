@@ -1,6 +1,7 @@
 import { LikesDislikesDatabase } from "../database/LikesDislikesDatabase";
 import { PostDatabase } from "../database/PostDatabase";
 import { UserDatabase } from "../database/UserDatabase";
+import { CreatePostInputDTO, EditPostInputDTO, EditPostLikesInputDTO } from "../dtos/PostDTO";
 import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { LikesDislikes } from "../models/LikesDislikes";
@@ -37,7 +38,7 @@ export class PostBusiness {
         return output;
     }
 
-    public async createPost(input : any){
+    public async createPost(input : CreatePostInputDTO){
         const { content } = input;
         const postDatabase = new PostDatabase();
 
@@ -70,17 +71,13 @@ export class PostBusiness {
         await postDatabase.createPost(newPostDB);
     }
 
-    public async updatePostById(input : any, id : string){
-        const { content } = input;
+    public async updatePostById(input : EditPostInputDTO){
+        const { content , id } = input;
         const postDatabase = new PostDatabase();
 
         const postDB = await postDatabase.findPostById(id);
         if (!postDB){
             throw new NotFoundError("Não foi encontrado um post com esse id");
-        }
-
-        if (typeof content !== "string"){
-            throw new BadRequestError("'content' deve ser uma string");
         }
 
         postDB["content"] = content;
@@ -89,10 +86,11 @@ export class PostBusiness {
         await postDatabase.updatePostById(postDB, id);
     }
 
-    public async updatePostLikesById(input : any, id : string){
+    public async updatePostLikesById(input : EditPostLikesInputDTO){
         // Dado mockado
         const userId = "u003";
 
+        const { id } = input;
         const updatedLike = input.like;
         const postDatabase = new PostDatabase();
 
@@ -105,10 +103,6 @@ export class PostBusiness {
 
         if (postDB.creator_id === userId){
             throw new BadRequestError("Usuário não pode dar dislike/like no próprio post");
-        }
-
-        if (typeof updatedLike !== "boolean"){
-            throw new BadRequestError("'like' deve ser um boolean");
         }
 
         const likesDislikesDatabase = new LikesDislikesDatabase();
