@@ -128,6 +128,7 @@ export class PostBusiness {
 
     public async updatePostLikesById(input : EditPostLikesInputDTO) : Promise<void>{
         // Dado mockado
+        // user que deu like/dislike, não o autor do post!
         const userId = "u003";
 
         const { id } = input;
@@ -135,7 +136,7 @@ export class PostBusiness {
 
         const postDB = await this.postDatabase.findPostById(id);
         if (!postDB){
-            throw new NotFoundError("Não foi encontrado um post com esse id");
+            throw new NotFoundError("Não foi encontrado um post com esse 'id'");
         }
 
         const postId = postDB.id as string;
@@ -144,7 +145,7 @@ export class PostBusiness {
             throw new BadRequestError("Usuário não pode dar dislike/like no próprio post");
         }
 
-        const likesDislikesDB = await this.likesDislikesDatabase.findLikeByUserAndPostId(userId, postDB.id);
+        const likesDislikesDB = await this.likesDislikesDatabase.findLikeByUserAndPostId(userId, postId);
 
         let deltaLikes = 0;
         let deltaDislikes = 0;
@@ -211,14 +212,14 @@ export class PostBusiness {
         }
 
         const updatedPost = new Post(
-            postDB.id,
+            postId,
             postDB.content,
             postDB.likes + deltaLikes,
             postDB.dislikes + deltaDislikes,
             postDB.created_at,
             postDB.updated_at,
             {
-                id: postDB.id,
+                id: postDB.creator_id,
                 name: "" // não fará diferença
             }
         )
