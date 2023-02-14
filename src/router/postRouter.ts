@@ -5,13 +5,15 @@ import { LikesDislikesDatabase } from "../database/LikesDislikesDatabase";
 import { PostDatabase } from "../database/PostDatabase";
 import { UserDatabase } from "../database/UserDatabase";
 import { PostDTO } from "../dtos/PostDTO";
+import { IdGenerator } from "../services/IdGenerator";
 
 const postController = new PostController(
     new PostBusiness(
         new PostDatabase(),
         new UserDatabase(),
         new LikesDislikesDatabase(),
-        new PostDTO()
+        new PostDTO(),
+        new IdGenerator()
     ),
     new PostDTO()
 );
