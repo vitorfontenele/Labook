@@ -2,7 +2,6 @@ import { UserDatabase } from "../database/UserDatabase";
 import { CreateUserInputDTO, GetUserOutputDTO, UserDTO } from "../dtos/UserDTO";
 import { NotFoundError } from "../errors/NotFoundError";
 import { User } from "../models/User";
-import { UserDB } from "../types";
 
 export class UserBusiness {
     public async getUsers() : Promise<GetUserOutputDTO[]>{
@@ -55,7 +54,7 @@ export class UserBusiness {
         
         const id = ((new Date()).getTime()).toString();
         const createdAt = (new Date()).toISOString();
-        const role = "author";
+        const role = "author"; // dado mockado, manter?
 
         const newUser = new User (id, name, email, password, role, createdAt);
 
