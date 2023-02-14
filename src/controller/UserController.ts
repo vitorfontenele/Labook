@@ -4,10 +4,14 @@ import { UserDTO } from "../dtos/UserDTO";
 import { BaseError } from "../errors/BaseError"
 
 export class UserController {
+    constructor(
+        private userBusiness : UserBusiness,
+        private userDTO : UserDTO
+    ){}
+    
     public getUsers = async(req: Request, res: Response) => {
         try {
-            const userBusiness = new UserBusiness();
-            const output = await userBusiness.getUsers();
+            const output = await this.userBusiness.getUsers();
 
             res.status(200).send(output);
         } catch (error) {
@@ -25,8 +29,7 @@ export class UserController {
         try {
             const id = req.params.id;
 
-            const userBusiness = new UserBusiness();
-            const output = await userBusiness.getUserById(id);
+            const output = await this.userBusiness.getUserById(id);
 
             res.status(200).send(output);
         } catch (error) {
@@ -44,11 +47,9 @@ export class UserController {
         try {
             const { name , email , password } = req.body;
 
-            const userDTO = new UserDTO();
-            const input = userDTO.createUserInput(name, email, password);
+            const input = this.userDTO.createUserInput(name, email, password);
 
-            const userBusiness = new UserBusiness();
-            await userBusiness.createUser(input);
+            await this.userBusiness.createUser(input);
 
             res.status(201).send("Usuário cadastrado com sucesso");
         } catch (error) {
