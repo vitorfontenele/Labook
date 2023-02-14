@@ -1,3 +1,5 @@
+import { PostDB } from "../types"
+
 export class Post {
     constructor(
         private id : string,
@@ -11,6 +13,18 @@ export class Post {
             name: string
         }
     ){}
+
+    public toDBModel() : PostDB {
+        return {
+            id: this.id,
+            content: this.content,
+            likes: this.likes,
+            dislikes: this.dislikes,
+            created_at: this.createdAt,
+            updated_at: this.updatedAt,
+            creator_id: this.creator.id
+        }
+    }
 
     public getId(): string {
         return this.id

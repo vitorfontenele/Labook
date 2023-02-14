@@ -122,10 +122,24 @@ export class PostBusiness {
 
         const updatedAt = (new Date()).toISOString();
 
-        postDB["content"] = content;
-        postDB["updated_at"] = updatedAt;
+        // Talvez não valha a pena buscar o nome do criador do post
+        // Essa informação não será usada para atualizar o post
+        const updatedPost = new Post(
+            id,
+            content,
+            postDB.likes,
+            postDB.dislikes,
+            postDB.created_at,
+            updatedAt,
+            {
+                id: postDB.creator_id,
+                name: ""
+            }
+        )
 
-        await postDatabase.updatePostById(postDB, id);
+        const updatedPostDB = updatedPost.toDBModel();
+
+        await postDatabase.updatePostById(updatedPostDB, id);
     }
 
     public async updatePostLikesById(input : EditPostLikesInputDTO) : Promise<void>{
