@@ -98,16 +98,7 @@ export class PostBusiness {
             }
         )
 
-        const newPostDB : PostDB = {
-            id: newPost.getId(),
-            creator_id: newPost.getCreator().id,
-            content: newPost.getContent(),
-            likes: newPost.getLikes(),
-            dislikes: newPost.getDislikes(),
-            created_at: newPost.getCreatedAt(),
-            updated_at: newPost.getUpdatedAt()
-        }
-
+        const newPostDB = newPost.toDBModel();
         await postDatabase.createPost(newPostDB);
     }
 
@@ -122,8 +113,6 @@ export class PostBusiness {
 
         const updatedAt = (new Date()).toISOString();
 
-        // Talvez não valha a pena buscar o nome do criador do post
-        // Essa informação não será usada para atualizar o post
         const updatedPost = new Post(
             id,
             content,
@@ -133,12 +122,11 @@ export class PostBusiness {
             updatedAt,
             {
                 id: postDB.creator_id,
-                name: ""
+                name: "" // não fará diferença
             }
         )
 
         const updatedPostDB = updatedPost.toDBModel();
-
         await postDatabase.updatePostById(updatedPostDB, id);
     }
 
@@ -228,9 +216,21 @@ export class PostBusiness {
             }
         }
 
-        postDB.likes += deltaLikes;
-        postDB.dislikes += deltaDislikes;
-        await postDatabase.updatePostById(postDB, postId);
+        const updatedPost = new Post(
+            postDB.id,
+            postDB.content,
+            postDB.likes + deltaLikes,
+            postDB.dislikes + deltaDislikes,
+            postDB.created_at,
+            postDB.updated_at,
+            {
+                id: postDB.id,
+                name: "" // não fará diferença
+            }
+        )
+
+        const updatedPostDB = updatedPost.toDBModel();
+        await postDatabase.updatePostById(updatedPostDB, postId);
     }
 
     public async deletePostById(id : string) : Promise<void>{
