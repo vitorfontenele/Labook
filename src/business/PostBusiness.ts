@@ -6,7 +6,7 @@ import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { LikesDislikes } from "../models/LikesDislikes";
 import { Post } from "../models/Post";
-import { LikesDislikesDB, PostDB, UserDB } from "../types";
+import { LikesDislikesDB, UserDB } from "../types";
 
 export class PostBusiness {
     public async getPosts() : Promise<GetPostOutputDTO[]>{
