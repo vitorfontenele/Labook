@@ -2,11 +2,13 @@ import { UserDatabase } from "../database/UserDatabase";
 import { CreateUserInputDTO, GetUserOutputDTO, UserDTO } from "../dtos/UserDTO";
 import { NotFoundError } from "../errors/NotFoundError";
 import { User } from "../models/User";
+import { IdGenerator } from "../services/IdGenerator";
 
 export class UserBusiness {
     constructor(
         private userDatabase: UserDatabase,
-        private userDTO: UserDTO
+        private userDTO: UserDTO,
+        private idGenerator: IdGenerator
     ){}
 
     public async getUsers() : Promise<GetUserOutputDTO[]>{
@@ -50,7 +52,7 @@ export class UserBusiness {
     public async createUser(input : CreateUserInputDTO) : Promise<void>{
         const { name , email , password } = input;
 
-        const id = ((new Date()).getTime()).toString();
+        const id = this.idGenerator.generate();
         const createdAt = (new Date()).toISOString();
         const role = "author"; // dado mockado, manter?
 
