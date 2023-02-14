@@ -1,3 +1,5 @@
+import { UserDB } from "../types";
+
 export class User {
     constructor(
         private id : string,
@@ -7,6 +9,17 @@ export class User {
         private role : string,
         private createdAt : string
     ){}
+
+    public toDBModel() : UserDB {
+        return {
+            id: this.id,
+            name: this.name,
+            email: this.email,
+            password: this.password,
+            role: this.role,
+            created_at: this.createdAt
+        }
+    }
 
     public getId() : string {
         return this.id;

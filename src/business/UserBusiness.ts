@@ -57,17 +57,9 @@ export class UserBusiness {
         const createdAt = (new Date()).toISOString();
         const role = "author";
 
-        const newUser = new User (id, name, email, password,role, createdAt);
+        const newUser = new User (id, name, email, password, role, createdAt);
 
-        const newUserDB : UserDB = {
-            id: newUser.getId(),
-            name: newUser.getName(),
-            email: newUser.getEmail(),
-            password: newUser.getPassword(),
-            role: newUser.getRole(),
-            created_at: newUser.getCreatedAt()
-        };
-
+        const newUserDB = newUser.toDBModel();
         await userDatabase.createUser(newUserDB);
     }
 }
