@@ -9,6 +9,13 @@ import { Post } from "../models/Post";
 import { LikesDislikesDB, UserDB } from "../types";
 
 export class PostBusiness {
+    constructor(
+        private postDatabase : PostDatabase,
+        private userDatabase : UserDatabase,
+        private likesDislikesDatabase : LikesDislikesDatabase,
+        private postDTO : PostDTO
+    ){}
+
     public async getPosts() : Promise<GetPostOutputDTO[]>{
         const postDatabase = new PostDatabase();
         const postsDB = await postDatabase.findPosts();
