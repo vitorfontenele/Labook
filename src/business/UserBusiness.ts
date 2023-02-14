@@ -1,14 +1,17 @@
 import { UserDatabase } from "../database/UserDatabase";
-import { CreateUserInputDTO, GetUserOutputDTO, UserDTO } from "../dtos/UserDTO";
+import { CreateUserInputDTO, CreateUserOutputDTO, GetUserOutputDTO, UserDTO } from "../dtos/UserDTO";
 import { NotFoundError } from "../errors/NotFoundError";
 import { User } from "../models/User";
 import { IdGenerator } from "../services/IdGenerator";
+import { TokenManager } from "../services/TokenManager";
+import { TokenPayload, USER_ROLES } from "../types";
 
 export class UserBusiness {
     constructor(
         private userDatabase: UserDatabase,
         private userDTO: UserDTO,
-        private idGenerator: IdGenerator
+        private idGenerator: IdGenerator,
+        private tokenManager: TokenManager
     ){}
 
     public async getUsers() : Promise<GetUserOutputDTO[]>{
@@ -49,16 +52,28 @@ export class UserBusiness {
         return output;
     }
 
-    public async createUser(input : CreateUserInputDTO) : Promise<void>{
+    public async createUser(input : CreateUserInputDTO) : Promise<CreateUserOutputDTO>{
         const { name , email , password } = input;
 
         const id = this.idGenerator.generate();
         const createdAt = (new Date()).toISOString();
-        const role = "author"; // dado mockado, manter?
+        const role = USER_ROLES.NORMAL;
 
         const newUser = new User (id, name, email, password, role, createdAt);
 
+        const tokenPayload : TokenPayload = {
+            id: newUser.getId(),
+            name: newUser.getName(),
+            role: newUser.getRole()
+        }
+
+        const token = this.tokenManager.createToken(tokenPayload);
+
         const newUserDB = newUser.toDBModel();
         await this.userDatabase.createUser(newUserDB);
+
+        const output = this.userDTO.createUserOutput(token)
+
+        return output;
     }
 }

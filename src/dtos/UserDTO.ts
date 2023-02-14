@@ -2,10 +2,14 @@ import { BadRequestError } from "../errors/BadRequestError";
 import { User } from "../models/User";
 
 export interface CreateUserInputDTO {
-    name : string
-    email : string
-    password : string
-} 
+    name: string
+    email: string
+    password: string
+}
+
+export interface CreateUserOutputDTO {
+    token: string
+}
 
 export interface GetUserOutputDTO {
     id: string
@@ -41,6 +45,14 @@ export class UserDTO {
             name,
             email,
             password
+        }
+
+        return result;
+    }
+
+    createUserOutput(token : string) : CreateUserOutputDTO {
+        const result : CreateUserOutputDTO = {
+            token
         }
 
         return result;
