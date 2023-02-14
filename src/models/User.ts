@@ -1,4 +1,4 @@
-import { UserDB } from "../types";
+import { UserDB, USER_ROLES } from "../types";
 
 export class User {
     constructor(
@@ -6,7 +6,7 @@ export class User {
         private name : string,
         private email : string,
         private password : string,
-        private role : string,
+        private role : USER_ROLES,
         private createdAt : string
     ){}
 
@@ -53,11 +53,11 @@ export class User {
         this.password = value;
     }
 
-    public getRole() : string {
+    public getRole() : USER_ROLES {
         return this.role;
     }
 
-    public setRole(value : string) : void {
+    public setRole(value : USER_ROLES) : void {
         this.role = value;
     }
 

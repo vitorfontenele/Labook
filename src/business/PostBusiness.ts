@@ -7,13 +7,15 @@ import { NotFoundError } from "../errors/NotFoundError";
 import { LikesDislikes } from "../models/LikesDislikes";
 import { Post } from "../models/Post";
 import { LikesDislikesDB, UserDB } from "../types";
+import { IdGenerator } from "../services/IdGenerator";
 
 export class PostBusiness {
     constructor(
         private postDatabase : PostDatabase,
         private userDatabase : UserDatabase,
         private likesDislikesDatabase : LikesDislikesDatabase,
-        private postDTO : PostDTO
+        private postDTO : PostDTO,
+        private idGenerator : IdGenerator
     ){}
 
     public async getPosts() : Promise<GetPostOutputDTO[]>{
@@ -77,7 +79,7 @@ export class PostBusiness {
     public async createPost(input : CreatePostInputDTO) : Promise<void>{
         const { content } = input;
 
-        const id = ((new Date()).getTime()).toString();
+        const id = this.idGenerator.generate();
         const createdAt = (new Date()).toISOString();
         const likes = 0;
         const dislikes = 0;

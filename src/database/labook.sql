@@ -1,4 +1,4 @@
--- Active: 1676000213886@@127.0.0.1@3306
+-- Active: 1676400852737@@127.0.0.1@3306
 
 -- TABLE users
 -- query a
@@ -8,7 +8,7 @@ DROP TABLE users;
 CREATE TABLE users(
     id TEXT PRIMARY KEY UNIQUE NOT NULL,
     name TEXT NOT NULL,
-    email TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
     password TEXT NOT NULL,
     role TEXT NOT NULL,
     created_at TEXT NOT NULL
@@ -16,10 +16,10 @@ CREATE TABLE users(
 
 -- query c
 INSERT INTO users (id, name, email, password, role, created_at) VALUES
-    ("u001", "John Titor", "johntitor@gmail.com", "passw0rd", "author", "2022-06-03T11:45:23Z"),
-    ("u002", "Carl Donovan", "carldonovan@gmail.com", "passw1rd", "admin", "2023-01-17T09:32:12Z"),
-    ("u003", "Julia Schmidt", "juliaschmidt@gmail.com", "passw1rd", "author", "2022-07-03T11:45:23Z"),
-    ("u004", "Alice Grassi", "alicegrassi@gmail.com", "pasZw0rd", "author", "2022-06-02T11:45:23Z");
+    ("u001", "John Titor", "johntitor@gmail.com", "passw0rd", "NORMAL", "2022-06-03T11:45:23Z"),
+    ("u002", "Carl Donovan", "carldonovan@gmail.com", "passw1rd", "ADMIN", "2023-01-17T09:32:12Z"),
+    ("u003", "Julia Schmidt", "juliaschmidt@gmail.com", "passw1rd", "NORMAL", "2022-07-03T11:45:23Z"),
+    ("u004", "Alice Grassi", "alicegrassi@gmail.com", "pasZw0rd", "NORMAL", "2022-06-02T11:45:23Z");
 
 -- query d
 SELECT * FROM users;
