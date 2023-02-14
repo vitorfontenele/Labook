@@ -4,10 +4,14 @@ import { PostDTO } from "../dtos/PostDTO";
 import { BaseError } from "../errors/BaseError";
 
 export class PostController {
+    constructor(
+        private postBusiness : PostBusiness,
+        private postDTO : PostDTO
+    ){}
+
     public getPosts = async (req: Request, res: Response) => {
         try {
-            const postBusiness = new PostBusiness();
-            const output = await postBusiness.getPosts();
+            const output = await this.postBusiness.getPosts();
 
             res.status(200).send(output);
         } catch (error) {
@@ -25,8 +29,7 @@ export class PostController {
         try {
             const id = req.params.id;
 
-            const postBusiness = new PostBusiness();
-            const output = await postBusiness.getPostById(id);
+            const output = await this.postBusiness.getPostById(id);
 
             res.status(200).send(output);
         } catch (error) {
@@ -44,11 +47,8 @@ export class PostController {
         try {
             const content = req.body.content;
 
-            const postDTO = new PostDTO();
-            const input = postDTO.createPostInput(content);
-
-            const postBusiness = new PostBusiness();
-            await postBusiness.createPost(input);
+            const input = this.postDTO.createPostInput(content);
+            await this.postBusiness.createPost(input);
 
             res.status(201).send("Post criado com sucesso");
         } catch (error) {
@@ -67,11 +67,8 @@ export class PostController {
             const id = req.params.id;
             const content = req.body.content;
 
-            const postDTO = new PostDTO();
-            const input = postDTO.editPostInput(id, content);
-
-            const postBusiness = new PostBusiness();
-            await postBusiness.updatePostById(input);
+            const input = this.postDTO.editPostInput(id, content);
+            await this.postBusiness.updatePostById(input);
 
             res.status(200).send("Post atualizado com sucesso");
         } catch (error) {
@@ -90,11 +87,8 @@ export class PostController {
             const id = req.params.id;
             const like = req.body.like;
 
-            const postDTO = new PostDTO();
-            const input = postDTO.editPostLikesInput(id, like);
-
-            const postBusiness = new PostBusiness();
-            await postBusiness.updatePostLikesById(input);
+            const input = this.postDTO.editPostLikesInput(id, like);
+            await this.postBusiness.updatePostLikesById(input);
 
             res.status(200).send("Like atualizado com sucesso");
         } catch (error) {
@@ -112,8 +106,7 @@ export class PostController {
         try {
             const id = req.params.id;
 
-            const postBusiness = new PostBusiness();
-            await postBusiness.deletePostById(id);
+            await this.postBusiness.deletePostById(id);
 
             res.status(200).send("Post deletado com sucesso");
         } catch (error) {

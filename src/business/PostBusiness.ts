@@ -9,14 +9,16 @@ import { Post } from "../models/Post";
 import { LikesDislikesDB, UserDB } from "../types";
 
 export class PostBusiness {
+    constructor(
+        private postDatabase : PostDatabase,
+        private userDatabase : UserDatabase,
+        private likesDislikesDatabase : LikesDislikesDatabase,
+        private postDTO : PostDTO
+    ){}
+
     public async getPosts() : Promise<GetPostOutputDTO[]>{
-        const postDatabase = new PostDatabase();
-        const postsDB = await postDatabase.findPosts();
-
-        const userDatabase = new UserDatabase();
-        const usersDB = await userDatabase.findUsers();
-
-        const postDTO = new PostDTO();
+        const postsDB = await this.postDatabase.findPosts();
+        const usersDB = await this.userDatabase.findUsers();
 
         const output = postsDB.map(postDB => {
             const post = new Post (
@@ -29,7 +31,7 @@ export class PostBusiness {
                 getCreator(postDB.creator_id)
             );
 
-            return postDTO.getPostOutput(post);
+            return this.postDTO.getPostOutput(post);
         })             
 
         function getCreator(userId : string){
@@ -45,16 +47,13 @@ export class PostBusiness {
     }
 
     public async getPostById(id : string) : Promise<GetPostOutputDTO>{
-        const postDatabase = new PostDatabase();
-        const userDatabase = new UserDatabase();
-
-        const postDB = await postDatabase.findPostById(id);
+        const postDB = await this.postDatabase.findPostById(id);
         if (!postDB){
             throw new NotFoundError("Não foi encontrado um post com esse 'id'");
         }
 
         const userId = postDB.creator_id;
-        const userDB = await userDatabase.findUserById(userId);
+        const userDB = await this.userDatabase.findUserById(userId);
         const userName = userDB?.name;
 
         const post = new Post(
@@ -70,15 +69,13 @@ export class PostBusiness {
             }
         )
 
-        const postDTO = new PostDTO();
-        const output = postDTO.getPostOutput(post);
+        const output = this.postDTO.getPostOutput(post);
 
         return output;
     }
 
     public async createPost(input : CreatePostInputDTO) : Promise<void>{
         const { content } = input;
-        const postDatabase = new PostDatabase();
 
         const id = ((new Date()).getTime()).toString();
         const createdAt = (new Date()).toISOString();
@@ -93,20 +90,19 @@ export class PostBusiness {
             createdAt,
             createdAt,
             {
-                id: "u001",
-                name: "John Titor"
+                id: "u001", // mockado
+                name: "John Titor" // mockado
             }
         )
 
         const newPostDB = newPost.toDBModel();
-        await postDatabase.createPost(newPostDB);
+        await this.postDatabase.createPost(newPostDB);
     }
 
     public async updatePostById(input : EditPostInputDTO) : Promise<void>{
         const { content , id } = input;
-        const postDatabase = new PostDatabase();
 
-        const postDB = await postDatabase.findPostById(id);
+        const postDB = await this.postDatabase.findPostById(id);
         if (!postDB){
             throw new NotFoundError("Não foi encontrado um post com esse id");
         }
@@ -127,7 +123,7 @@ export class PostBusiness {
         )
 
         const updatedPostDB = updatedPost.toDBModel();
-        await postDatabase.updatePostById(updatedPostDB, id);
+        await this.postDatabase.updatePostById(updatedPostDB, id);
     }
 
     public async updatePostLikesById(input : EditPostLikesInputDTO) : Promise<void>{
@@ -136,9 +132,8 @@ export class PostBusiness {
 
         const { id } = input;
         const updatedLike = input.like;
-        const postDatabase = new PostDatabase();
 
-        const postDB = await postDatabase.findPostById(id);
+        const postDB = await this.postDatabase.findPostById(id);
         if (!postDB){
             throw new NotFoundError("Não foi encontrado um post com esse id");
         }
@@ -149,8 +144,7 @@ export class PostBusiness {
             throw new BadRequestError("Usuário não pode dar dislike/like no próprio post");
         }
 
-        const likesDislikesDatabase = new LikesDislikesDatabase();
-        const likesDislikesDB = await likesDislikesDatabase.findLikeByUserAndPostId(userId, postDB.id);
+        const likesDislikesDB = await this.likesDislikesDatabase.findLikeByUserAndPostId(userId, postDB.id);
 
         let deltaLikes = 0;
         let deltaDislikes = 0;
@@ -175,7 +169,7 @@ export class PostBusiness {
                 like : newLikesDislikes.getLike()
             }
 
-            await likesDislikesDatabase.createLike(newLikesDislikesDB);
+            await this.likesDislikesDatabase.createLike(newLikesDislikesDB);
         } else {
             // Caso já exista um like ou dislike do user no post
             const like = likesDislikesDB.like;
@@ -183,7 +177,7 @@ export class PostBusiness {
             if ((updatedLike === Boolean(like))){
                 // Usuário dá like num post que já havia dado like
                 // ou dá dislike num post que já havia dado dislike
-                await likesDislikesDatabase.deleteLikeByUserAndPostId(userId, postId);
+                await this.likesDislikesDatabase.deleteLikeByUserAndPostId(userId, postId);
 
                 if (updatedLike){
                     // -1 like
@@ -205,7 +199,7 @@ export class PostBusiness {
                     like: updatedLikesDislikes.getLike()
                 }
 
-                await likesDislikesDatabase.updateLikeByUserAndPostId(
+                await this.likesDislikesDatabase.updateLikeByUserAndPostId(
                     updatedLikesDislikesDB,
                     userId,
                     postId
@@ -230,22 +224,19 @@ export class PostBusiness {
         )
 
         const updatedPostDB = updatedPost.toDBModel();
-        await postDatabase.updatePostById(updatedPostDB, postId);
+        await this.postDatabase.updatePostById(updatedPostDB, postId);
     }
 
     public async deletePostById(id : string) : Promise<void>{
-        const postDatabase = new PostDatabase();
-        const postDB = await postDatabase.findPostById(id);
-
-        const likesDislikesDatabase = new LikesDislikesDatabase();
-        const likesDislikesDB = await likesDislikesDatabase.findLikesByPostId(id);
+        const postDB = await this.postDatabase.findPostById(id);
+        const likesDislikesDB = await this.likesDislikesDatabase.findLikesByPostId(id);
 
         if (!postDB){
             throw new NotFoundError("Não existe um post com esse 'id'");
         }
         if (likesDislikesDB.length > 0){
-            await likesDislikesDatabase.deleteLikesByPostId(id);
+            await this.likesDislikesDatabase.deleteLikesByPostId(id);
         }
-        await postDatabase.deletePostById(id);
+        await this.postDatabase.deletePostById(id);
     }
 }
