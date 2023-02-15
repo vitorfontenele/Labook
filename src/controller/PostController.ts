@@ -11,6 +11,10 @@ export class PostController {
 
     public getPosts = async (req: Request, res: Response) => {
         try {
+            const token = req.headers.authorization;
+
+            // const input = this.postDTO.
+
             const output = await this.postBusiness.getPosts();
 
             res.status(200).send(output);
