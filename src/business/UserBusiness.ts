@@ -1,5 +1,6 @@
 import { UserDatabase } from "../database/UserDatabase";
 import { CreateUserInputDTO, CreateUserOutputDTO, GetUserOutputDTO, UserDTO } from "../dtos/UserDTO";
+import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { User } from "../models/User";
 import { IdGenerator } from "../services/IdGenerator";
@@ -54,6 +55,11 @@ export class UserBusiness {
 
     public async createUser(input : CreateUserInputDTO) : Promise<CreateUserOutputDTO>{
         const { name , email , password } = input;
+
+        const userDB = await this.userDatabase.findUserByEmail(email);
+        if (userDB){
+            throw new BadRequestError("Já existe um user com esse 'email'");
+        }
 
         const id = this.idGenerator.generate();
         const createdAt = (new Date()).toISOString();
