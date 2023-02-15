@@ -1,5 +1,6 @@
 import { BadRequestError } from "../errors/BadRequestError";
 import { User } from "../models/User";
+import { emailRegex, passwordRegex } from "../regex";
 
 export interface CreateUserInputDTO {
     name: string
@@ -37,8 +38,16 @@ export class UserDTO {
             throw new BadRequestError("'email' precisa ser uma string");
         }
 
+        if (!emailRegex.test(email)){
+            throw new BadRequestError("'email' não está no formato adequado");
+        }
+
         if (typeof password !== "string"){
             throw new BadRequestError("'password' precisa ser uma string");
+        }
+
+        if (!passwordRegex.test(password)){
+            throw new BadRequestError("'password' deve ter entre 4 e 8 caracteres e no mínimo um número");
         }
 
         const result : CreateUserInputDTO = {
