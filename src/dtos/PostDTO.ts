@@ -3,6 +3,7 @@ import { Post } from "../models/Post";
 
 export interface CreatePostInputDTO {
     content : string
+    token: string
 }
 
 export interface EditPostInputDTO {
@@ -79,13 +80,18 @@ export class PostDTO {
         return result;
     }
 
-    createPostInput = (content: unknown) : CreatePostInputDTO => {
+    createPostInput = (content: unknown, token: unknown) : CreatePostInputDTO => {
         if (typeof content !== "string"){
             throw new BadRequestError("'content' deve ser uma string");
         }
 
+        if (typeof token !== "string"){
+            throw new BadRequestError("Token inválido");
+        }
+
         const result : CreatePostInputDTO = {
-            content
+            content,
+            token
         }
 
         return result;

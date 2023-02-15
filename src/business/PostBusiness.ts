@@ -94,7 +94,12 @@ export class PostBusiness {
     }
 
     public async createPost(input : CreatePostInputDTO) : Promise<void>{
-        const { content } = input;
+        const { content , token } = input;
+
+        const payload = this.tokenManager.getPayload(token);
+        if (payload === null){
+            throw new BadRequestError("Token inválido");
+        }
 
         const id = this.idGenerator.generate();
         const createdAt = (new Date()).toISOString();
@@ -109,8 +114,8 @@ export class PostBusiness {
             createdAt,
             createdAt,
             {
-                id: "u001", // mockado
-                name: "John Titor" // mockado
+                id: payload.id, 
+                name: payload.name
             }
         )
 

@@ -51,8 +51,9 @@ export class PostController {
     public createPost = async (req: Request, res: Response) => {
         try {
             const content = req.body.content;
+            const token = req.headers.authorization;
 
-            const input = this.postDTO.createPostInput(content);
+            const input = this.postDTO.createPostInput(content, token);
             await this.postBusiness.createPost(input);
 
             res.status(201).send("Post criado com sucesso");
