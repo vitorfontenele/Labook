@@ -3,6 +3,7 @@ import { CreateUserInputDTO, CreateUserOutputDTO, GetUserByIdInputDTO, GetUserIn
 import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { User } from "../models/User";
+import { HashManager } from "../services/HashManager";
 import { IdGenerator } from "../services/IdGenerator";
 import { TokenManager } from "../services/TokenManager";
 import { TokenPayload, USER_ROLES } from "../types";
@@ -12,7 +13,8 @@ export class UserBusiness {
         private userDatabase: UserDatabase,
         private userDTO: UserDTO,
         private idGenerator: IdGenerator,
-        private tokenManager: TokenManager
+        private tokenManager: TokenManager,
+        private hashManager: HashManager
     ){}
 
     public async getUsers(input : GetUserInputDTO) : Promise<GetUserOutputDTO[]>{
@@ -77,8 +79,9 @@ export class UserBusiness {
         const id = this.idGenerator.generate();
         const createdAt = (new Date()).toISOString();
         const role = USER_ROLES.NORMAL;
+        const hashedPassword = await this.hashManager.hash(password);
 
-        const newUser = new User (id, name, email, password, role, createdAt);
+        const newUser = new User (id, name, email, hashedPassword, role, createdAt);
 
         const tokenPayload : TokenPayload = {
             id: newUser.getId(),
@@ -104,7 +107,9 @@ export class UserBusiness {
             throw new NotFoundError("'email' não encontrado")
         }
 
-        if (password !== userDB.password) {
+        const isPasswordCorrect = await this.hashManager.compare(password, userDB.password);
+
+        if (!isPasswordCorrect) {
             throw new BadRequestError("'email' ou 'password' incorretos")
         }
 

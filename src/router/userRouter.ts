@@ -3,6 +3,7 @@ import { UserBusiness } from "../business/UserBusiness";
 import { UserController } from "../controller/UserController";
 import { UserDatabase } from "../database/UserDatabase";
 import { UserDTO } from "../dtos/UserDTO";
+import { HashManager } from "../services/HashManager";
 import { IdGenerator } from "../services/IdGenerator";
 import { TokenManager } from "../services/TokenManager";
 
@@ -11,7 +12,8 @@ const userController = new UserController(
         new UserDatabase(),
         new UserDTO(),
         new IdGenerator(),
-        new TokenManager()
+        new TokenManager(),
+        new HashManager()
     ), 
     new UserDTO());
     
