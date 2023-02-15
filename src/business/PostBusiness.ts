@@ -137,7 +137,7 @@ export class PostBusiness {
         }
 
         if (payload.id !== postDB.creator_id){
-            throw new BadRequestError("Somente quem criou o post pode editá-lo");
+            throw new ForbidenError("Somente quem criou o post pode editá-lo");
         }
 
         const updatedAt = (new Date()).toISOString();
