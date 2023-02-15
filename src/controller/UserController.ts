@@ -48,10 +48,28 @@ export class UserController {
             const { name , email , password } = req.body;
 
             const input = this.userDTO.createUserInput(name, email, password);
+            const output = await this.userBusiness.createUser(input);
 
-            await this.userBusiness.createUser(input);
+            res.status(201).send(output);
+        } catch (error) {
+            console.log(error)
 
-            res.status(201).send("Usuário cadastrado com sucesso");
+            if (error instanceof BaseError) {
+                res.status(error.statusCode).send(error.message)
+            } else {
+                res.status(500).send("Erro inesperado")
+            }
+        }
+    }
+
+    public loginUser = async(req: Request, res: Response) => {
+        try {
+            const { email , password } = req.body;
+
+            const input = this.userDTO.loginUserInput(email, password);
+            const output = await this.userBusiness.loginUser(input);
+
+            res.status(200).send(output);
         } catch (error) {
             console.log(error)
 
