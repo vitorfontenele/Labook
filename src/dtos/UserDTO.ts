@@ -34,6 +34,10 @@ export class UserDTO {
             throw new BadRequestError("'name' precisa ser uma string");
         }
 
+        if (name.length < 2){
+            throw new BadRequestError("'name' precisa ter no mínimo 2 caracteres");
+        }
+
         if (typeof email !== "string"){
             throw new BadRequestError("'email' precisa ser uma string");
         }
