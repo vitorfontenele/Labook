@@ -1,13 +1,15 @@
 import { LikesDislikesDatabase } from "../database/LikesDislikesDatabase";
 import { PostDatabase } from "../database/PostDatabase";
 import { UserDatabase } from "../database/UserDatabase";
-import { CreatePostInputDTO, EditPostInputDTO, EditPostLikesInputDTO, GetPostOutputDTO, PostDTO } from "../dtos/PostDTO";
+import { CreatePostInputDTO, EditPostInputDTO, EditPostLikesInputDTO, GetPostByIdInputDTO, GetPostInputDTO, GetPostOutputDTO, PostDTO } from "../dtos/PostDTO";
 import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { LikesDislikes } from "../models/LikesDislikes";
 import { Post } from "../models/Post";
-import { LikesDislikesDB, UserDB } from "../types";
+import { LikesDislikesDB, UserDB, USER_ROLES } from "../types";
 import { IdGenerator } from "../services/IdGenerator";
+import { TokenManager } from "../services/TokenManager";
+import { ForbidenError } from "../errors/ForbiddenError";
 
 export class PostBusiness {
     constructor(
@@ -15,10 +17,22 @@ export class PostBusiness {
         private userDatabase : UserDatabase,
         private likesDislikesDatabase : LikesDislikesDatabase,
         private postDTO : PostDTO,
-        private idGenerator : IdGenerator
+        private idGenerator : IdGenerator,
+        private tokenManager: TokenManager
     ){}
 
-    public async getPosts() : Promise<GetPostOutputDTO[]>{
+    public async getPosts(input: GetPostInputDTO) : Promise<GetPostOutputDTO[]>{
+        const { token } = input;
+
+        const payload = this.tokenManager.getPayload(token);
+        if (payload === null){
+            throw new BadRequestError("Token inválido");
+        }
+
+        if (payload.role !== USER_ROLES.ADMIN){
+            throw new ForbidenError("Você não tem permissão para utilizar esse recurso");
+        }
+
         const postsDB = await this.postDatabase.findPosts();
         const usersDB = await this.userDatabase.findUsers();
 
@@ -48,7 +62,18 @@ export class PostBusiness {
         return output;
     }
 
-    public async getPostById(id : string) : Promise<GetPostOutputDTO>{
+    public async getPostById(input: GetPostByIdInputDTO) : Promise<GetPostOutputDTO>{
+        const { id , token } = input;
+
+        const payload = this.tokenManager.getPayload(token);
+        if (payload === null){
+            throw new BadRequestError("Token inválido");
+        }
+
+        if (payload.role !== USER_ROLES.ADMIN){
+            throw new ForbidenError("Você não tem permissão para utilizar esse recurso");
+        }
+
         const postDB = await this.postDatabase.findPostById(id);
         if (!postDB){
             throw new NotFoundError("Não foi encontrado um post com esse 'id'");

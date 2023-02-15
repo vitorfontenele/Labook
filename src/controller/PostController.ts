@@ -13,9 +13,8 @@ export class PostController {
         try {
             const token = req.headers.authorization;
 
-            // const input = this.postDTO.
-
-            const output = await this.postBusiness.getPosts();
+            const input = this.postDTO.getPostInput(token);
+            const output = await this.postBusiness.getPosts(input);
 
             res.status(200).send(output);
         } catch (error) {
@@ -31,9 +30,11 @@ export class PostController {
 
     public getPostById = async (req: Request, res: Response) => {
         try {
+            const token = req.headers.authorization;
             const id = req.params.id;
 
-            const output = await this.postBusiness.getPostById(id);
+            const input = this.postDTO.getPostByIdInput(token, id);
+            const output = await this.postBusiness.getPostById(input);
 
             res.status(200).send(output);
         } catch (error) {

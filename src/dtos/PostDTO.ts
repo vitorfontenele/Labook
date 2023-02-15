@@ -15,6 +15,10 @@ export interface EditPostLikesInputDTO {
     like : boolean
 }
 
+export interface GetPostInputDTO {
+    token: string
+}
+
 export interface GetPostOutputDTO {
     id : string
     content : string
@@ -28,7 +32,24 @@ export interface GetPostOutputDTO {
     }
 }
 
+export interface GetPostByIdInputDTO {
+    id: string
+    token: string
+}
+
 export class PostDTO {
+    getPostInput = (token: unknown) : GetPostInputDTO => {
+        if (typeof token !== "string"){
+            throw new BadRequestError ("Token inválido");
+        }
+
+        const result : GetPostInputDTO = {
+            token
+        }
+
+        return result;
+    }
+
     getPostOutput = (post: Post) : GetPostOutputDTO => {
         const result : GetPostOutputDTO = {
             id: post.getId(),
@@ -40,6 +61,21 @@ export class PostDTO {
             creator: post.getCreator()
         }
         
+        return result;
+    }
+
+    getPostByIdInput = (token: unknown, id: string) : GetPostByIdInputDTO => {
+        // id é path param
+        
+        if (typeof token !== "string"){
+            throw new BadRequestError ("Token inválido");
+        }
+
+        const result : GetPostByIdInputDTO = {
+            id,
+            token
+        }
+
         return result;
     }
 
