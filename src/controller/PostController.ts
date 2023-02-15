@@ -93,8 +93,9 @@ export class PostController {
         try {
             const id = req.params.id;
             const like = req.body.like;
+            const token = req.headers.authorization;
 
-            const input = this.postDTO.editPostLikesInput(id, like);
+            const input = this.postDTO.editPostLikesInput(id, like, token);
             await this.postBusiness.updatePostLikesById(input);
 
             res.status(200).send("Like atualizado com sucesso");

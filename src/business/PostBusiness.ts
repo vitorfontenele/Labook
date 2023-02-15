@@ -160,12 +160,16 @@ export class PostBusiness {
     }
 
     public async updatePostLikesById(input : EditPostLikesInputDTO) : Promise<void>{
-        // Dado mockado
-        // user que deu like/dislike, não o autor do post!
-        const userId = "u003";
-
-        const { id } = input;
+        const { id , token } = input;
         const updatedLike = input.like;
+
+        const payload = this.tokenManager.getPayload(token);
+        if (payload === null){
+            throw new BadRequestError("Token inválido");
+        } 
+
+        // user que deu like/dislike, não o autor do post!
+        const userId = payload.id;
 
         const postDB = await this.postDatabase.findPostById(id);
         if (!postDB){
