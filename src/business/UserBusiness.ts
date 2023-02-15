@@ -1,5 +1,5 @@
 import { UserDatabase } from "../database/UserDatabase";
-import { CreateUserInputDTO, CreateUserOutputDTO, GetUserOutputDTO, UserDTO } from "../dtos/UserDTO";
+import { CreateUserInputDTO, CreateUserOutputDTO, GetUserOutputDTO, LoginUserInputDTO, LoginUserOutputDTO, UserDTO } from "../dtos/UserDTO";
 import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { User } from "../models/User";
@@ -79,6 +79,42 @@ export class UserBusiness {
         await this.userDatabase.createUser(newUserDB);
 
         const output = this.userDTO.createUserOutput(token)
+
+        return output;
+    }
+
+    public async loginUser(input : LoginUserInputDTO) : Promise<LoginUserOutputDTO> {
+        const { email , password } = input;
+
+        const userDB = await this.userDatabase.findUserByEmail(email);
+        if (!userDB) {
+            throw new NotFoundError("'email' não encontrado")
+        }
+
+        if (password !== userDB.password) {
+            throw new BadRequestError("'email' ou 'password' incorretos")
+        }
+
+        const user = new User(
+            userDB.id,
+            userDB.name,
+            userDB.email,
+            userDB.password,
+            userDB.role,
+            userDB.created_at
+        )
+
+        const payload : TokenPayload = {
+            id: user.getId(),
+            name: user.getName(),
+            role: user.getRole()
+        }
+
+        const token = this.tokenManager.createToken(payload);
+
+        const output : LoginUserOutputDTO = {
+            token
+        }
 
         return output;
     }
