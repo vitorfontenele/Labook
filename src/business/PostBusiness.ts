@@ -29,10 +29,6 @@ export class PostBusiness {
             throw new BadRequestError("Token inválido");
         }
 
-        if (payload.role !== USER_ROLES.ADMIN){
-            throw new ForbidenError("Você não tem permissão para utilizar esse recurso");
-        }
-
         const postsDB = await this.postDatabase.findPosts();
         const usersDB = await this.userDatabase.findUsers();
 
@@ -68,10 +64,6 @@ export class PostBusiness {
         const payload = this.tokenManager.getPayload(token);
         if (payload === null){
             throw new BadRequestError("Token inválido");
-        }
-
-        if (payload.role !== USER_ROLES.ADMIN){
-            throw new ForbidenError("Você não tem permissão para utilizar esse recurso");
         }
 
         const postDB = await this.postDatabase.findPostById(id);

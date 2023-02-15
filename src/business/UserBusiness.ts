@@ -1,7 +1,6 @@
 import { UserDatabase } from "../database/UserDatabase";
 import { CreateUserInputDTO, CreateUserOutputDTO, GetUserByIdInputDTO, GetUserInputDTO, GetUserOutputDTO, LoginUserInputDTO, LoginUserOutputDTO, UserDTO } from "../dtos/UserDTO";
 import { BadRequestError } from "../errors/BadRequestError";
-import { ForbidenError } from "../errors/ForbiddenError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { User } from "../models/User";
 import { IdGenerator } from "../services/IdGenerator";
@@ -23,10 +22,6 @@ export class UserBusiness {
         const payload = this.tokenManager.getPayload(token);
         if (payload === null){
             throw new BadRequestError("Token inválido");
-        }
-
-        if (payload.role !== USER_ROLES.ADMIN){
-            throw new ForbidenError("Você não tem permissão para utilizar esse recurso");
         }
 
         const output = usersDB.map(userDB => {
@@ -51,11 +46,7 @@ export class UserBusiness {
         if (payload === null){
             throw new BadRequestError("Token inválido");
         }
-
-        if (payload.role !== USER_ROLES.ADMIN){
-            throw new ForbidenError("Você não tem permissão para utilizar esse recurso");
-        }
-        
+     
         const userDB = await this.userDatabase.findUserById(id);
         if (!userDB){
             throw new NotFoundError("Não foi encontrado um user com esse 'id'");
