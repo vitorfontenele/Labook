@@ -11,7 +11,10 @@ export class UserController {
     
     public getUsers = async(req: Request, res: Response) => {
         try {
-            const output = await this.userBusiness.getUsers();
+            const token = req.headers.authorization;
+
+            const input = this.userDTO.getUserInput(token);
+            const output = await this.userBusiness.getUsers(input);
 
             res.status(200).send(output);
         } catch (error) {
@@ -28,8 +31,10 @@ export class UserController {
     public getUserById = async(req: Request, res: Response) => {
         try {
             const id = req.params.id;
+            const token = req.headers.authorization;
 
-            const output = await this.userBusiness.getUserById(id);
+            const input = this.userDTO.getUserInputById(token, id);
+            const output = await this.userBusiness.getUserById(input);
 
             res.status(200).send(output);
         } catch (error) {

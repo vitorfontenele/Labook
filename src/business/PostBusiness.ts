@@ -1,13 +1,15 @@
 import { LikesDislikesDatabase } from "../database/LikesDislikesDatabase";
 import { PostDatabase } from "../database/PostDatabase";
 import { UserDatabase } from "../database/UserDatabase";
-import { CreatePostInputDTO, EditPostInputDTO, EditPostLikesInputDTO, GetPostOutputDTO, PostDTO } from "../dtos/PostDTO";
+import { CreatePostInputDTO, DeletePostInputDTO, EditPostInputDTO, EditPostLikesInputDTO, GetPostByIdInputDTO, GetPostInputDTO, GetPostOutputDTO, PostDTO } from "../dtos/PostDTO";
 import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { LikesDislikes } from "../models/LikesDislikes";
 import { Post } from "../models/Post";
-import { LikesDislikesDB, UserDB } from "../types";
+import { LikesDislikesDB, UserDB, USER_ROLES } from "../types";
 import { IdGenerator } from "../services/IdGenerator";
+import { TokenManager } from "../services/TokenManager";
+import { ForbidenError } from "../errors/ForbiddenError";
 
 export class PostBusiness {
     constructor(
@@ -15,10 +17,18 @@ export class PostBusiness {
         private userDatabase : UserDatabase,
         private likesDislikesDatabase : LikesDislikesDatabase,
         private postDTO : PostDTO,
-        private idGenerator : IdGenerator
+        private idGenerator : IdGenerator,
+        private tokenManager: TokenManager
     ){}
 
-    public async getPosts() : Promise<GetPostOutputDTO[]>{
+    public async getPosts(input: GetPostInputDTO) : Promise<GetPostOutputDTO[]>{
+        const { token } = input;
+
+        const payload = this.tokenManager.getPayload(token);
+        if (payload === null){
+            throw new BadRequestError("Token inválido");
+        }
+
         const postsDB = await this.postDatabase.findPosts();
         const usersDB = await this.userDatabase.findUsers();
 
@@ -48,7 +58,14 @@ export class PostBusiness {
         return output;
     }
 
-    public async getPostById(id : string) : Promise<GetPostOutputDTO>{
+    public async getPostById(input: GetPostByIdInputDTO) : Promise<GetPostOutputDTO>{
+        const { id , token } = input;
+
+        const payload = this.tokenManager.getPayload(token);
+        if (payload === null){
+            throw new BadRequestError("Token inválido");
+        }
+
         const postDB = await this.postDatabase.findPostById(id);
         if (!postDB){
             throw new NotFoundError("Não foi encontrado um post com esse 'id'");
@@ -77,7 +94,12 @@ export class PostBusiness {
     }
 
     public async createPost(input : CreatePostInputDTO) : Promise<void>{
-        const { content } = input;
+        const { content , token } = input;
+
+        const payload = this.tokenManager.getPayload(token);
+        if (payload === null){
+            throw new BadRequestError("Token inválido");
+        }
 
         const id = this.idGenerator.generate();
         const createdAt = (new Date()).toISOString();
@@ -92,8 +114,8 @@ export class PostBusiness {
             createdAt,
             createdAt,
             {
-                id: "u001", // mockado
-                name: "John Titor" // mockado
+                id: payload.id, 
+                name: payload.name
             }
         )
 
@@ -102,11 +124,20 @@ export class PostBusiness {
     }
 
     public async updatePostById(input : EditPostInputDTO) : Promise<void>{
-        const { content , id } = input;
+        const { content , id , token } = input;
+
+        const payload = this.tokenManager.getPayload(token);
+        if (payload === null){
+            throw new BadRequestError("Token inválido");
+        }
 
         const postDB = await this.postDatabase.findPostById(id);
         if (!postDB){
             throw new NotFoundError("Não foi encontrado um post com esse id");
+        }
+
+        if (payload.id !== postDB.creator_id){
+            throw new ForbidenError("Somente quem criou o post pode editá-lo");
         }
 
         const updatedAt = (new Date()).toISOString();
@@ -129,12 +160,16 @@ export class PostBusiness {
     }
 
     public async updatePostLikesById(input : EditPostLikesInputDTO) : Promise<void>{
-        // Dado mockado
-        // user que deu like/dislike, não o autor do post!
-        const userId = "u003";
-
-        const { id } = input;
+        const { id , token } = input;
         const updatedLike = input.like;
+
+        const payload = this.tokenManager.getPayload(token);
+        if (payload === null){
+            throw new BadRequestError("Token inválido");
+        } 
+
+        // user que deu like/dislike, não o autor do post!
+        const userId = payload.id;
 
         const postDB = await this.postDatabase.findPostById(id);
         if (!postDB){
@@ -230,13 +265,24 @@ export class PostBusiness {
         await this.postDatabase.updatePostById(updatedPostDB, postId);
     }
 
-    public async deletePostById(id : string) : Promise<void>{
-        const postDB = await this.postDatabase.findPostById(id);
-        const likesDislikesDB = await this.likesDislikesDatabase.findLikesByPostId(id);
+    public async deletePostById(input: DeletePostInputDTO) : Promise<void>{
+        const { id , token } = input;
 
+        const payload = this.tokenManager.getPayload(token);
+        if (payload === null){
+            throw new BadRequestError("Token inválido");
+        }        
+
+        const postDB = await this.postDatabase.findPostById(id);
         if (!postDB){
             throw new NotFoundError("Não existe um post com esse 'id'");
         }
+
+        if (payload.role !== USER_ROLES.ADMIN && (postDB.creator_id !== payload.id)){
+            throw new ForbidenError("Você não tem permissão para realizar essa ação");
+        }
+
+        const likesDislikesDB = await this.likesDislikesDatabase.findLikesByPostId(id);
         if (likesDislikesDB.length > 0){
             await this.likesDislikesDatabase.deleteLikesByPostId(id);
         }

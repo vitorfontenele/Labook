@@ -13,10 +13,20 @@ export interface CreateUserOutputDTO {
     token: string
 }
 
+export interface GetUserInputDTO {
+    token: string
+}
+
+
 export interface GetUserOutputDTO {
     id: string
     name: string
     role: USER_ROLES
+}
+
+export interface GetUserByIdInputDTO {
+    id: string 
+    token: string
 }
 
 export interface LoginUserInputDTO {
@@ -29,11 +39,38 @@ export interface LoginUserOutputDTO {
 }
 
 export class UserDTO {
+    getUserInput(token : unknown){
+        if (typeof token !== "string"){
+            throw new BadRequestError("Token inválido");
+        }
+
+        const result : GetUserInputDTO = {
+            token
+        }
+
+        return result;
+    }
+
     getUserOutput(user: User) : GetUserOutputDTO {
         const result : GetUserOutputDTO = {
             id: user.getId(),
             name: user.getName(),
             role: user.getRole()
+        }
+
+        return result;
+    }
+
+    getUserInputById(token: unknown, id: string){
+        // id é path param
+
+        if (typeof token !== "string"){
+            throw new BadRequestError("Token inválido");
+        }
+
+        const result : GetUserByIdInputDTO = {
+            id,
+            token
         }
 
         return result;

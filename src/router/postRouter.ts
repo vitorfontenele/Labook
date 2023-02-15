@@ -6,6 +6,7 @@ import { PostDatabase } from "../database/PostDatabase";
 import { UserDatabase } from "../database/UserDatabase";
 import { PostDTO } from "../dtos/PostDTO";
 import { IdGenerator } from "../services/IdGenerator";
+import { TokenManager } from "../services/TokenManager";
 
 const postController = new PostController(
     new PostBusiness(
@@ -13,7 +14,8 @@ const postController = new PostController(
         new UserDatabase(),
         new LikesDislikesDatabase(),
         new PostDTO(),
-        new IdGenerator()
+        new IdGenerator(),
+        new TokenManager()
     ),
     new PostDTO()
 );

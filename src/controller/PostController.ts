@@ -11,7 +11,10 @@ export class PostController {
 
     public getPosts = async (req: Request, res: Response) => {
         try {
-            const output = await this.postBusiness.getPosts();
+            const token = req.headers.authorization;
+
+            const input = this.postDTO.getPostInput(token);
+            const output = await this.postBusiness.getPosts(input);
 
             res.status(200).send(output);
         } catch (error) {
@@ -27,9 +30,11 @@ export class PostController {
 
     public getPostById = async (req: Request, res: Response) => {
         try {
+            const token = req.headers.authorization;
             const id = req.params.id;
 
-            const output = await this.postBusiness.getPostById(id);
+            const input = this.postDTO.getPostByIdInput(token, id);
+            const output = await this.postBusiness.getPostById(input);
 
             res.status(200).send(output);
         } catch (error) {
@@ -46,8 +51,9 @@ export class PostController {
     public createPost = async (req: Request, res: Response) => {
         try {
             const content = req.body.content;
+            const token = req.headers.authorization;
 
-            const input = this.postDTO.createPostInput(content);
+            const input = this.postDTO.createPostInput(content, token);
             await this.postBusiness.createPost(input);
 
             res.status(201).send("Post criado com sucesso");
@@ -66,8 +72,9 @@ export class PostController {
         try {
             const id = req.params.id;
             const content = req.body.content;
+            const token = req.headers.authorization;
 
-            const input = this.postDTO.editPostInput(id, content);
+            const input = this.postDTO.editPostInput(id, content, token);
             await this.postBusiness.updatePostById(input);
 
             res.status(200).send("Post atualizado com sucesso");
@@ -86,8 +93,9 @@ export class PostController {
         try {
             const id = req.params.id;
             const like = req.body.like;
+            const token = req.headers.authorization;
 
-            const input = this.postDTO.editPostLikesInput(id, like);
+            const input = this.postDTO.editPostLikesInput(id, like, token);
             await this.postBusiness.updatePostLikesById(input);
 
             res.status(200).send("Like atualizado com sucesso");
@@ -105,8 +113,10 @@ export class PostController {
     public deletePostById = async(req: Request, res: Response) => {
         try {
             const id = req.params.id;
+            const token = req.headers.authorization;
 
-            await this.postBusiness.deletePostById(id);
+            const input = this.postDTO.deletePostInput(id, token);
+            await this.postBusiness.deletePostById(input);
 
             res.status(200).send("Post deletado com sucesso");
         } catch (error) {

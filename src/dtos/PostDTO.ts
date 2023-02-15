@@ -3,16 +3,23 @@ import { Post } from "../models/Post";
 
 export interface CreatePostInputDTO {
     content : string
+    token: string
 }
 
 export interface EditPostInputDTO {
     id : string
     content : string
+    token: string
 }
 
 export interface EditPostLikesInputDTO {
     id : string
     like : boolean
+    token: string
+}
+
+export interface GetPostInputDTO {
+    token: string
 }
 
 export interface GetPostOutputDTO {
@@ -28,7 +35,29 @@ export interface GetPostOutputDTO {
     }
 }
 
+export interface GetPostByIdInputDTO {
+    id: string
+    token: string
+}
+
+export interface DeletePostInputDTO{
+    id: string
+    token: string
+}
+
 export class PostDTO {
+    getPostInput = (token: unknown) : GetPostInputDTO => {
+        if (typeof token !== "string"){
+            throw new BadRequestError ("Token inválido");
+        }
+
+        const result : GetPostInputDTO = {
+            token
+        }
+
+        return result;
+    }
+
     getPostOutput = (post: Post) : GetPostOutputDTO => {
         const result : GetPostOutputDTO = {
             id: post.getId(),
@@ -43,43 +72,85 @@ export class PostDTO {
         return result;
     }
 
-    createPostInput = (content: unknown) : CreatePostInputDTO => {
-        if (typeof content !== "string"){
-            throw new BadRequestError("'content' deve ser uma string");
+    getPostByIdInput = (token: unknown, id: string) : GetPostByIdInputDTO => {
+        // id é path param
+        
+        if (typeof token !== "string"){
+            throw new BadRequestError ("Token inválido");
         }
 
-        const result : CreatePostInputDTO = {
-            content
+        const result : GetPostByIdInputDTO = {
+            id,
+            token
         }
 
         return result;
     }
 
-    editPostInput = (id : string, content : unknown) : EditPostInputDTO => {
+    createPostInput = (content: unknown, token: unknown) : CreatePostInputDTO => {
+        if (typeof content !== "string"){
+            throw new BadRequestError("'content' deve ser uma string");
+        }
+
+        if (typeof token !== "string"){
+            throw new BadRequestError("Token inválido");
+        }
+
+        const result : CreatePostInputDTO = {
+            content,
+            token
+        }
+
+        return result;
+    }
+
+    editPostInput = (id : string, content : unknown, token: unknown) : EditPostInputDTO => {
         // id é string pois path param
         
         if (typeof content !== "string"){
             throw new BadRequestError("'content' deve ser uma string");
         }
+        if (typeof token !== "string"){
+            throw new BadRequestError("Token inválido");
+        }
 
         const result : EditPostInputDTO = {
             id,
-            content
+            content,
+            token
         }
 
         return result;
     }
 
-    editPostLikesInput = (id : string, like : unknown) : EditPostLikesInputDTO => {
+    editPostLikesInput = (id : string, like : unknown, token: unknown) : EditPostLikesInputDTO => {
         // id é string pois path param
         
         if (typeof like !== "boolean"){
             throw new BadRequestError("'like' deve ser um boolean");
         }
+        if (typeof token !== "string"){
+            throw new BadRequestError("Token inválido");
+        }
 
         const result : EditPostLikesInputDTO = {
             id,
-            like
+            like,
+            token
+        }
+
+        return result;
+    }
+
+    deletePostInput = (id: string, token: unknown) : DeletePostInputDTO => {
+        // id é string pois path param
+        if (typeof token !== "string"){
+            throw new BadRequestError("Token inválido");
+        }
+
+        const result : DeletePostInputDTO = {
+            id,
+            token
         }
 
         return result;
