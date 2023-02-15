@@ -1,10 +1,10 @@
--- Active: 1676400852737@@127.0.0.1@3306
+-- Active: 1676491070487@@127.0.0.1@3306
 
--- TABLE users
--- query a
+-- 1) TABLE users
+-- query 1.1
 DROP TABLE users;
 
--- query b
+-- query 1.2
 CREATE TABLE users(
     id TEXT PRIMARY KEY UNIQUE NOT NULL,
     name TEXT NOT NULL,
@@ -14,21 +14,32 @@ CREATE TABLE users(
     created_at TEXT NOT NULL
 );
 
--- query c
-INSERT INTO users (id, name, email, password, role, created_at) VALUES
-    ("u001", "John Titor", "johntitor@gmail.com", "passw0rd", "NORMAL", "2022-06-03T11:45:23Z"),
-    ("u002", "Carl Donovan", "carldonovan@gmail.com", "passw1rd", "ADMIN", "2023-01-17T09:32:12Z"),
-    ("u003", "Julia Schmidt", "juliaschmidt@gmail.com", "passw1rd", "NORMAL", "2022-07-03T11:45:23Z"),
-    ("u004", "Alice Grassi", "alicegrassi@gmail.com", "pasZw0rd", "NORMAL", "2022-06-02T11:45:23Z");
+-- ADMIN (inserido pelo Postman)
+-- name: Carl Donovan
+-- email: carldonovan@gmail.com
+-- password: passw1rd
 
--- query d
+-- query 1.3
+UPDATE users
+SET role = "ADMIN"
+WHERE email = "carldonovan@gmail.com";
+
+-- NORMAL USERS (inseridos via Postman)
+/*
+(name, email, password)
+("John Titor", "johntitor@gmail.com", "passw0rd")
+("Julia Schmidt", "juliaschmidt@gmail.com", "passw1rd")
+("Alice Grassi", "alicegrassi@gmail.com", "pasZw0rd")
+*/
+
+-- query 1.4
 SELECT * FROM users;
 
--- TABLE posts
--- query e
+-- 2) TABLE posts
+-- query 2.1
 DROP TABLE posts;
 
--- query f
+-- query 2.2
 CREATE TABLE posts (
     id TEXT PRIMARY KEY UNIQUE NOT NULL,
     creator_id TEXT NOT NULL,
@@ -40,20 +51,14 @@ CREATE TABLE posts (
     FOREIGN KEY (creator_id) REFERENCES users(id)
 );
 
--- query g
-INSERT INTO posts(id, creator_id, content, created_at, updated_at) VALUES 
-    ("post001", "u001", "Hello World!", "2022-06-03T11:45:23Z", "2022-06-03T11:45:23Z"),
-    ("post002", "u003", "I'm going to watch a movie.", "2022-07-03T11:45:23Z", "2022-07-03T11:45:23Z"),
-    ("post003", "u004", "LOL! I fried an egg.", "2022-08-03T11:45:23Z", "2022-08-03T11:45:23Z");
-
--- query h
+-- query 2.3
 SELECT * FROM posts;
 
--- TABLE likes_dislikes
--- query i
+-- 3) TABLE likes_dislikes
+-- query 3.1
 DROP TABLE likes_dislikes;
 
--- query j
+-- query 3.2
 CREATE TABLE likes_dislikes (
     user_id TEXT NOT NULL,
     post_id TEXT NOT NULL,
@@ -63,10 +68,5 @@ CREATE TABLE likes_dislikes (
     UNIQUE (user_id, post_id)
 );
 
--- query k
-INSERT INTO likes_dislikes VALUES 
-    ("u001", "post003", 1),
-    ("u003", "post004", 1);
-
--- query l
+-- query 3.3
 SELECT * FROM likes_dislikes;
