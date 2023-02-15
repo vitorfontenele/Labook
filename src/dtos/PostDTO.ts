@@ -9,6 +9,7 @@ export interface CreatePostInputDTO {
 export interface EditPostInputDTO {
     id : string
     content : string
+    token: string
 }
 
 export interface EditPostLikesInputDTO {
@@ -34,6 +35,11 @@ export interface GetPostOutputDTO {
 }
 
 export interface GetPostByIdInputDTO {
+    id: string
+    token: string
+}
+
+export interface DeletePostInputDTO{
     id: string
     token: string
 }
@@ -97,16 +103,20 @@ export class PostDTO {
         return result;
     }
 
-    editPostInput = (id : string, content : unknown) : EditPostInputDTO => {
+    editPostInput = (id : string, content : unknown, token: unknown) : EditPostInputDTO => {
         // id é string pois path param
         
         if (typeof content !== "string"){
             throw new BadRequestError("'content' deve ser uma string");
         }
+        if (typeof token !== "string"){
+            throw new BadRequestError("Token inválido");
+        }
 
         const result : EditPostInputDTO = {
             id,
-            content
+            content,
+            token
         }
 
         return result;
@@ -122,6 +132,20 @@ export class PostDTO {
         const result : EditPostLikesInputDTO = {
             id,
             like
+        }
+
+        return result;
+    }
+
+    deletePostInput = (id: string, token: unknown) : DeletePostInputDTO => {
+        // id é string pois path param
+        if (typeof token !== "string"){
+            throw new BadRequestError("Token inválido");
+        }
+
+        const result : DeletePostInputDTO = {
+            id,
+            token
         }
 
         return result;

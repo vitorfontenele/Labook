@@ -1,7 +1,7 @@
 import { LikesDislikesDatabase } from "../database/LikesDislikesDatabase";
 import { PostDatabase } from "../database/PostDatabase";
 import { UserDatabase } from "../database/UserDatabase";
-import { CreatePostInputDTO, EditPostInputDTO, EditPostLikesInputDTO, GetPostByIdInputDTO, GetPostInputDTO, GetPostOutputDTO, PostDTO } from "../dtos/PostDTO";
+import { CreatePostInputDTO, DeletePostInputDTO, EditPostInputDTO, EditPostLikesInputDTO, GetPostByIdInputDTO, GetPostInputDTO, GetPostOutputDTO, PostDTO } from "../dtos/PostDTO";
 import { BadRequestError } from "../errors/BadRequestError";
 import { NotFoundError } from "../errors/NotFoundError";
 import { LikesDislikes } from "../models/LikesDislikes";
@@ -124,11 +124,20 @@ export class PostBusiness {
     }
 
     public async updatePostById(input : EditPostInputDTO) : Promise<void>{
-        const { content , id } = input;
+        const { content , id , token } = input;
+
+        const payload = this.tokenManager.getPayload(token);
+        if (payload === null){
+            throw new BadRequestError("Token inválido");
+        }
 
         const postDB = await this.postDatabase.findPostById(id);
         if (!postDB){
             throw new NotFoundError("Não foi encontrado um post com esse id");
+        }
+
+        if (payload.id !== postDB.creator_id){
+            throw new BadRequestError("Somente quem criou o post pode editá-lo");
         }
 
         const updatedAt = (new Date()).toISOString();
@@ -252,13 +261,24 @@ export class PostBusiness {
         await this.postDatabase.updatePostById(updatedPostDB, postId);
     }
 
-    public async deletePostById(id : string) : Promise<void>{
-        const postDB = await this.postDatabase.findPostById(id);
-        const likesDislikesDB = await this.likesDislikesDatabase.findLikesByPostId(id);
+    public async deletePostById(input: DeletePostInputDTO) : Promise<void>{
+        const { id , token } = input;
 
+        const payload = this.tokenManager.getPayload(token);
+        if (payload === null){
+            throw new BadRequestError("Token inválido");
+        }        
+
+        const postDB = await this.postDatabase.findPostById(id);
         if (!postDB){
             throw new NotFoundError("Não existe um post com esse 'id'");
         }
+
+        if (payload.role !== USER_ROLES.ADMIN && (postDB.creator_id !== payload.id)){
+            throw new ForbidenError("Você não tem permissão para realizar essa ação");
+        }
+
+        const likesDislikesDB = await this.likesDislikesDatabase.findLikesByPostId(id);
         if (likesDislikesDB.length > 0){
             await this.likesDislikesDatabase.deleteLikesByPostId(id);
         }

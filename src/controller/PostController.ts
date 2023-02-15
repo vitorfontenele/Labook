@@ -72,8 +72,9 @@ export class PostController {
         try {
             const id = req.params.id;
             const content = req.body.content;
+            const token = req.headers.authorization;
 
-            const input = this.postDTO.editPostInput(id, content);
+            const input = this.postDTO.editPostInput(id, content, token);
             await this.postBusiness.updatePostById(input);
 
             res.status(200).send("Post atualizado com sucesso");
@@ -111,8 +112,10 @@ export class PostController {
     public deletePostById = async(req: Request, res: Response) => {
         try {
             const id = req.params.id;
+            const token = req.headers.authorization;
 
-            await this.postBusiness.deletePostById(id);
+            const input = this.postDTO.deletePostInput(id, token);
+            await this.postBusiness.deletePostById(input);
 
             res.status(200).send("Post deletado com sucesso");
         } catch (error) {
