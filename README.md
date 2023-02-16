@@ -64,6 +64,8 @@ Seguem exemplos de como utilizar a API criada neste projeto:
 
 * [Documentação feita no Postman](https://documenter.getpostman.com/view/24457509/2s93CGRb2f)
 
+<p align="right">(<a href="#readme-top">voltar para o topo</a>)</p>
+
  <!-- CONTATO -->
  ## Contato
 
