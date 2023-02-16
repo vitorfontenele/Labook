@@ -60,7 +60,9 @@ Este projeto é parte dos projetos realizados como atividade durante o bootcamp 
 <!-- DOCUMENTAÇÃO -->
 ## Documentação
 
-Seguem exemplos de como utilizar a API criada neste projeto, utilizando a documentação feita no Postman.
+Seguem exemplos de como utilizar a API criada neste projeto:
+
+* [Documentação feita no Postman](https://documenter.getpostman.com/view/24457509/2s93CGRb2f)
 
  <!-- CONTATO -->
  ## Contato
