@@ -44,7 +44,7 @@ Este projeto é parte dos projetos realizados como atividade durante o bootcamp 
 
 1. Clone o repositório:
    ```sh
-   git clone https://github.com/vitorfontenele/labecommerce-backend.git
+   git clone https://github.com/vitorfontenele/labook.git
    ```
 2. Instale os pacotes NPM:
    ```sh
